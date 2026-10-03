@@ -19,11 +19,24 @@ class HeritageController extends Controller
     ) { 
        $data = $heritageService->getById($id);
        $images = $heritageService->getImages($id);
+       $related = $heritageService->getRelated($id);
+       $recommendations = $heritageService->getRecommendations($id);
+       $components = $heritageService->getComponents($id);
 
         if (empty($data)) {
             abort(404);
         }
 
-        return view('heritage.show', compact('data', 'images'));
-    }
-}
+       return view(
+    'heritage.show',
+    compact(
+        'data',
+        'images',
+        'related',
+        'recommendations',
+        'components'
+    )
+    );
+    
+  }
+}  

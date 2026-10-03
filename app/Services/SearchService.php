@@ -162,6 +162,22 @@ class SearchService
 
         $result = $this->sparql->query($q);
 
+        $countQuery = File::get(
+        resource_path('sparql/search-count.rq')
+        );
+
+        $countQuery = str_replace(
+            '{{CONDITIONS}}',
+            $conditions,
+            $countQuery
+        );
+
+        $countResult = $this->sparql->query($countQuery);
+
+        $total = (int) (
+            $this->sparql->bindings($countResult)[0]['total']['value'] ?? 0
+        );
+
         $data = collect(
             $this->sparql->bindings($result)
         )->map(function ($b) {

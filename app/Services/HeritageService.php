@@ -54,6 +54,8 @@ class HeritageService
     return [
         'id' => $id,
         'name' => $first['name']['value'] ?? '-',
+        'description' => $first['description']['value'] ?? null,
+        'justification' => $first['justification']['value'] ?? null,
         'country' => basename($first['country']['value'] ?? ''),
         'region' => basename($first['region']['value'] ?? ''),
         'category' => basename($first['category']['value'] ?? ''),
@@ -93,5 +95,78 @@ class HeritageService
         ];
     })->values()->all();
  }
+
+        public function getRelated(string $id): array
+    {
+    $query = File::get(
+        resource_path('sparql/related-heritage.rq')
+    );
+
+    $query = str_replace(
+        '{{HERITAGE_ID}}',
+        $id,
+        $query
+    );
+
+    $result = $this->sparql->query($query);
+
+    return collect(
+        $this->sparql->bindings($result)
+    )->map(function ($b) {
+        return [
+            'id' => basename($b['heritage']['value'] ?? ''),
+            'name' => $b['name']['value'] ?? '-',
+        ];
+    })->values()->all();
+    }
+
+        public function getRecommendations(string $id): array
+{
+    $query = File::get(
+        resource_path('sparql/recommendation.rq')
+    );
+
+    $query = str_replace(
+        '{{HERITAGE_ID}}',
+        $id,
+        $query
+    );
+
+    $result = $this->sparql->query($query);
+
+    return collect(
+        $this->sparql->bindings($result)
+    )->map(function ($b) {
+        return [
+            'id' => basename($b['heritage']['value'] ?? ''),
+            'name' => $b['name']['value'] ?? '-',
+        ];
+    })->values()->all();
+    }
+
+    public function getComponents(string $id): array
+{
+    $query = File::get(
+        resource_path('sparql/heritage-components.rq')
+    );
+
+    $query = str_replace(
+        '{{HERITAGE_ID}}',
+        $id,
+        $query
+    );
+
+    $result = $this->sparql->query($query);
+
+    return collect(
+        $this->sparql->bindings($result)
+    )->map(function ($b) {
+        return [
+            'id' => basename($b['component']['value'] ?? ''),
+            'name' => $b['label']['value']
+                ?? basename($b['component']['value'] ?? ''),
+        ];
+    })->values()->all();
+    }
 
 }

@@ -1,0 +1,13 @@
+PREFIX wh: <https://example.org/heritage/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?component ?label
+WHERE {
+    wh:{{HERITAGE_ID}} wh:hasComponent ?component .
+
+    OPTIONAL {
+        ?component rdfs:label ?label .
+        FILTER(LANG(?label) = "en")
+    }
+}
+ORDER BY ?component

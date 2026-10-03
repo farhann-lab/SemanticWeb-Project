@@ -16,6 +16,20 @@
         {{ $data['name'] }}
     </h1>
 
+    @if(!empty($data['description']))
+
+    <div class="mt-6">
+        <p class="text-slate-400 text-sm mb-2">
+            Description
+        </p>
+
+        <p class="text-slate-300 leading-7">
+            {{ $data['description'] }}
+        </p>
+    </div>
+
+    @endif
+
     {{-- IMAGES --}}
     @if(!empty($images))
         <div class="mt-8">
@@ -76,6 +90,38 @@
 
     </div>
 
+    @if(count($components) > 0)
+
+    <section class="mt-8">
+
+        <h2 class="text-2xl font-bold mb-4">
+            Heritage Components
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+
+            @foreach($components as $component)
+
+                <div class="p-5 rounded-xl bg-slate-900 border border-slate-800">
+
+                    <p class="font-semibold">
+                        {{ $component['name'] }}
+                    </p>
+
+                    <p class="text-xs text-slate-500 mt-2">
+                        {{ $component['id'] }}
+                    </p>
+
+                </div>
+
+            @endforeach
+
+        </div>
+
+    </section>
+
+    @endif
+
     <div class="mt-8">
 
         <p class="text-slate-400">
@@ -101,6 +147,95 @@
         </div>
 
     </div>
+    @if(!empty($data['justification']))
+
+    <div class="mt-8">
+
+        <p class="text-slate-400 text-sm mb-2">
+            Justification
+        </p>
+
+        <div class="text-slate-300 leading-7 whitespace-pre-line">
+            {{ $data['justification'] }}
+        </div>
+
+    </div>
+
+    @endif
+
+        @if(!empty($related))
+
+    <div class="mt-10">
+
+        <p class="text-slate-400">
+            Related Heritage
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-4 mt-4">
+
+            @foreach($related as $item)
+
+                <a
+                    href="/heritage/{{ $item['id'] }}"
+                    class="p-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition"
+                >
+
+                    <p class="font-semibold">
+                        {{ $item['name'] }}
+                    </p>
+
+                    <p class="text-xs text-slate-500 mt-2">
+                        {{ $item['id'] }}
+                    </p>
+
+                </a>
+
+            @endforeach
+
+        </div>
+
+
+        @if(!empty($recommendations))
+
+    <div class="mt-10">
+
+        <p class="text-slate-400">
+            Recommended Heritage
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-4 mt-4">
+
+            @foreach($recommendations as $item)
+
+                <a
+                    href="/heritage/{{ $item['id'] }}"
+                    class="p-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition"
+                >
+
+                    <p class="font-semibold">
+                        {{ $item['name'] }}
+                    </p>
+
+                    <p class="text-xs text-slate-500 mt-2">
+                        {{ $item['id'] }}
+                    </p>
+
+                </a>
+
+            @endforeach
+
+        </div>
+
+    </div>
+
+@endif
+
+
+
+    </div>
+
+ @endif
+
 
 </div>
 

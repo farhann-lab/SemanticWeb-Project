@@ -8,8 +8,39 @@ use App\Http\Controllers\SearchController;
 use App\Services\HeritageService;
 
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', function (SparqlService $sparql) {
+
+    $query = "
+        PREFIX wh: <https://example.org/heritage/ontology/>
+
+        SELECT
+            (COUNT(?site) AS ?total)
+            (COUNT(DISTINCT ?country) AS ?countries)
+            (COUNT(DISTINCT ?region) AS ?regions)
+        WHERE {
+            ?site a wh:WorldHeritageSite .
+
+            OPTIONAL {
+                ?site wh:locatedIn ?country .
+            }
+
+            OPTIONAL {
+                ?site wh:belongsToRegion ?region .
+            }
+        }
+    ";
+
+    $result = $sparql->query($query);
+
+    $binding = $result['results']['bindings'][0] ?? [];
+
+    $stats = [
+        'total' => $binding['total']['value'] ?? 0,
+        'countries' => $binding['countries']['value'] ?? 0,
+        'regions' => $binding['regions']['value'] ?? 0,
+    ];
+
+    return view('welcome', compact('stats'));
 });
 
 Route::get('/test-fuseki', function (SparqlService $sparql) {

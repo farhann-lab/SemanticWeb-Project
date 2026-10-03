@@ -1,0 +1,18 @@
+PREFIX wh: <https://example.org/heritage/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?heritage ?name
+WHERE {
+    wh:{{HERITAGE_ID}} wh:locatedIn ?country ;
+                       wh:hasCategory ?category .
+
+    ?heritage a wh:WorldHeritageSite ;
+              wh:locatedIn ?country ;
+              wh:hasCategory ?category ;
+              rdfs:label ?name .
+
+    FILTER(?heritage != wh:{{HERITAGE_ID}})
+    FILTER(LANG(?name) = "en")
+}
+ORDER BY ?name
+LIMIT 6
