@@ -10,15 +10,20 @@ class HeritageController extends Controller
     {
         $data = $heritageService->getAll();
 
-        return response()->json($data);
+        return view('heritage.index', compact('data'));
     }
 
     public function show(
         string $id,
         HeritageService $heritageService
-    ) {
-        $data = $heritageService->getById($id);
+    ) { 
+       $data = $heritageService->getById($id);
+       $images = $heritageService->getImages($id);
 
-        return response()->json($data);
+        if (empty($data)) {
+            abort(404);
+        }
+
+        return view('heritage.show', compact('data', 'images'));
     }
 }

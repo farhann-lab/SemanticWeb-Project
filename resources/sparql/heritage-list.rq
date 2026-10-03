@@ -1,0 +1,3 @@
+PREFIX wh:<https://example.org/heritage/ontology/>
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?heritage ?name WHERE{?heritage a wh:WorldHeritageSite;rdfs:label ?name.FILTER(LANG(?name)="en")} ORDER BY ASC(?name) LIMIT {{LIMIT}} OFFSET {{OFFSET}}

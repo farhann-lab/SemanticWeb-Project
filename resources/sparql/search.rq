@@ -1,0 +1,20 @@
+PREFIX wh:<https://example.org/heritage/ontology/>
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
+
+SELECT DISTINCT ?heritage ?name ?inscriptionYear
+WHERE {
+    ?heritage a wh:WorldHeritageSite ;
+              rdfs:label ?name .
+
+    OPTIONAL {
+        ?heritage wh:inscriptionYear ?inscriptionYear
+    }
+
+    FILTER(LANG(?name)="en")
+
+    {{CONDITIONS}}
+}
+ORDER BY {{SORT}}
+LIMIT {{LIMIT}}
+OFFSET {{OFFSET}}

@@ -1,0 +1,7 @@
+PREFIX wh: <https://example.org/heritage/ontology/>
+
+SELECT ?image ?imageUrl
+WHERE {
+    wh:{{HERITAGE_ID}} wh:hasImage ?image .
+    ?image wh:imageUrl ?imageUrl .
+}

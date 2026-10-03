@@ -1,0 +1,3 @@
+PREFIX wh:<https://example.org/heritage/ontology/>
+SELECT ?category (COUNT(DISTINCT ?heritage) AS ?total) WHERE{
+?heritage a wh:WorldHeritageSite;wh:hasCategory ?category} GROUP BY ?category ORDER BY DESC(?total)

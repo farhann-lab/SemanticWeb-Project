@@ -1,0 +1,5 @@
+PREFIX wh:<https://example.org/heritage/ontology/>
+SELECT DISTINCT ?country ?region ?category ?criterion WHERE{
+?heritage a wh:WorldHeritageSite.
+OPTIONAL{?heritage wh:locatedIn ?country} OPTIONAL{?heritage wh:belongsToRegion ?region}
+OPTIONAL{?heritage wh:hasCategory ?category} OPTIONAL{?heritage wh:hasCriterion ?criterion}}
