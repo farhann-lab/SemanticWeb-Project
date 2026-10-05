@@ -8,10 +8,9 @@ use App\Services\SearchService;
 class SearchController extends Controller
 {
     public function index(SearchRequest $request, SearchService $service)
-{
+    {
+        $result = $service->search($request->validated());
 
-    $result = $service->search($request->validated());
-
-    return view('search.index', compact('result'));
-}
+        return view('explore.index', compact('result'));
+    }
 }

@@ -539,38 +539,12 @@
                 </div>
             </div>
 
-            {{-- Map Promo Banner (Tetap berada di dalam kontainer jika dipanggil di dalam layout) --}}
-            <section class="mt-10 bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-gray-950"></span>
-                        <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">Cartographic & Graph Discovery</span>
-                    </div>
-                    <h2 class="text-xl md:text-2xl font-bold text-gray-950 tracking-tight leading-snug">
-                        Need multi-dimensional spatial projection?
-                    </h2>
-                    <p class="text-sm text-gray-500 max-w-lg leading-relaxed">
-                        Switch to the interactive geographic projection to visualize transboundary migration corridors and climate risk heatmaps across all sites.
-                    </p>
-                </div>
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <a href="{{ url('/search') }}"
-                    class="h-10 px-5 rounded-full border border-gray-300 text-xs font-bold uppercase tracking-wide text-gray-950 flex items-center gap-2 hover:bg-gray-100 transition-colors">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                        SPARQL Console
-                    </a>
-                    <a href="{{ url('/map') }}"
-                    class="h-10 px-5 rounded-full bg-gray-950 text-white text-xs font-bold uppercase tracking-wide flex items-center gap-2 hover:bg-gray-800 transition-colors">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                        Launch Global Map
-                    </a>
-                </div>
-            </section>
+            
 
         </div>
     </main>
     <!-- 5. Banner Promosi Peta & 6. Footer Component -->
-    <x-explore.Footer />
+            <x-explore.Footer />
 
 </div>
 

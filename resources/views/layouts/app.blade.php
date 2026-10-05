@@ -13,15 +13,18 @@
     {{-- Vite Assets: Tailwind CSS & Alpine.js --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-white text-gray-950 min-h-screen antialiased">
+<body class="bg-white text-gray-950 min-h-screen antialiased flex flex-col justify-between">
 
     {{-- Modular Airbnb-inspired Navbar --}}
     <x-Navbar />
 
-    {{-- Main Page Content (Offset 88px for expanded fixed navbar) --}}
-    <main class="pt-[88px] max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {{-- Main Page Content --}}
+    <main class="pt-[88px] w-full min-h-screen flex-1">
         @yield('content')
     </main>
+
+    {{-- Footer diletakkan di luar <main> agar bisa full-width --}}
+    <x-explore.Footer />
 
 </body>
 </html>
