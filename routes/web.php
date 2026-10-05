@@ -43,6 +43,8 @@ Route::get('/', function (SparqlService $sparql) {
     return view('welcome', compact('stats'));
 });
 
+Route::redirect('/home', '/');
+
 Route::get('/test-fuseki', function (SparqlService $sparql) {
 
     $query = "
