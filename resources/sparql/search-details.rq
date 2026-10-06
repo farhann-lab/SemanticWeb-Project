@@ -1,0 +1,24 @@
+PREFIX wh:   <https://example.org/heritage/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Enrich one page of search results (ids are injected by SearchService, already validated).
+SELECT ?heritage
+    (SAMPLE(?catLabel)  AS ?category)
+    (SAMPLE(?regLabel)  AS ?region)
+    (SAMPLE(?dng)       AS ?danger)
+    (SAMPLE(?trb)       AS ?transboundary)
+    (SAMPLE(?imgUrl)    AS ?image)
+    (GROUP_CONCAT(DISTINCT COALESCE(?ctyLabel, ""); SEPARATOR="|") AS ?countries)
+    (GROUP_CONCAT(DISTINCT COALESCE(?critLabel, ""); SEPARATOR="|") AS ?criteria)
+WHERE {
+    VALUES ?heritage { {{IDS}} }
+
+    OPTIONAL { ?heritage wh:hasCategory ?cat . ?cat rdfs:label ?catLabel . FILTER(LANG(?catLabel) = "en") }
+    OPTIONAL { ?heritage wh:belongsToRegion ?reg . ?reg rdfs:label ?regLabel . FILTER(LANG(?regLabel) = "en") }
+    OPTIONAL { ?heritage wh:locatedIn ?cty . ?cty rdfs:label ?ctyLabel . FILTER(LANG(?ctyLabel) = "en") }
+    OPTIONAL { ?heritage wh:hasCriterion ?crit . ?crit rdfs:label ?critLabel }
+    OPTIONAL { ?heritage wh:isInDanger ?dng }
+    OPTIONAL { ?heritage wh:isTransboundary ?trb }
+    OPTIONAL { ?heritage wh:hasMainImage ?mi . ?mi wh:imageUrl ?imgUrl }
+}
+GROUP BY ?heritage

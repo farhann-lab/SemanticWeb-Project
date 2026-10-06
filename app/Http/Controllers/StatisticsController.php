@@ -2,42 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\SparqlService;
+use App\Services\StatisticsService;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class StatisticsController extends Controller
 {
-    public function index(SparqlService $sparql)
+    public function index(StatisticsService $service)
     {
-        $query = "
-            PREFIX wh: <https://example.org/heritage/ontology/>
+        try {
+            $stats      = $service->overview();
+            $categories = $service->byCategory();
+        } catch (Throwable $e) {
+            Log::error('Statistics unavailable: ' . $e->getMessage());
+            $stats      = ['total' => 0, 'countries' => 0, 'regions' => 0];
+            $categories = [];
+        }
 
-            SELECT
-                (COUNT(?site) AS ?total)
-                (COUNT(DISTINCT ?country) AS ?countries)
-                (COUNT(DISTINCT ?region) AS ?regions)
-            WHERE {
-                ?site a wh:WorldHeritageSite .
-
-                OPTIONAL {
-                    ?site wh:locatedIn ?country .
-                }
-
-                OPTIONAL {
-                    ?site wh:belongsToRegion ?region .
-                }
-            }
-        ";
-
-        $result = $sparql->query($query);
-
-        $binding = $result['results']['bindings'][0] ?? [];
-
-        $stats = [
-            'total' => $binding['total']['value'] ?? 0,
-            'countries' => $binding['countries']['value'] ?? 0,
-            'regions' => $binding['regions']['value'] ?? 0,
-        ];
-
-        return view('statistics.index', compact('stats'));
+        return view('statistics.index', compact('stats', 'categories'));
     }
 }

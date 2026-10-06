@@ -11,14 +11,14 @@
         request('region'),
         request('category'),
         request('criterion'),
-        request('year_min'),
-        request('year_max'),
+        (request('year_min') && request('year_min') > ($filters['year_min'] ?? 1978)) ? 'y' : null,
+        (request('year_max') && request('year_max') < ($filters['year_max'] ?? 2100)) ? 'y' : null,
         request('danger'),
         request('transboundary'),
     ])->filter()->count();
 @endphp
 
-<aside class="w-72 flex-shrink-0 sticky top-[88px] self-start hidden lg:block">
+<aside :class="{ '!block': mobileFilterOpen }" class="w-full lg:w-72 flex-shrink-0 lg:sticky lg:top-[88px] self-start hidden lg:block">
     <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
 
         {{-- Sidebar Header --}}
@@ -35,6 +35,8 @@
         </div>
 
         <form method="GET" action="{{ url('/search') }}" id="filter-form" class="divide-y divide-gray-100">
+            @if(request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
+            @if(request('criterion'))<input type="hidden" name="criterion" value="{{ request('criterion') }}">@endif
 
             {{-- 1. Search Keyword --}}
             <div class="px-5 py-4">
@@ -52,17 +54,15 @@
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Category</label>
                 <div class="flex flex-wrap gap-2">
                     @php
-                        $categories = [
-                            ''         => 'All',
-                            'Cultural' => 'Cultural',
-                            'Natural'  => 'Natural',
-                            'Mixed'    => 'Mixed',
-                        ];
+                        $categories = ['' => 'All'];
+                        foreach (($filters['categories'] ?? []) ?: [['value' => 'Cultural', 'label' => 'Cultural'], ['value' => 'Natural', 'label' => 'Natural'], ['value' => 'Mixed', 'label' => 'Mixed']] as $opt) {
+                            $categories[$opt['value']] = $opt['label'];
+                        }
                     @endphp
                     @foreach($categories as $val => $label)
                         <a href="{{ request()->fullUrlWithQuery(['category' => $val, 'page' => 1]) }}"
                            class="h-7 px-3 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors
-                                  {{ request('category', '') === $val
+                                  {{ strcasecmp(request('category', ''), (string) $val) === 0
                                       ? 'bg-gray-950 text-white border-gray-950'
                                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-950 hover:text-gray-950' }}">
                             {{ $label }}
@@ -79,7 +79,7 @@
                         class="w-full h-9 px-3 rounded-lg border border-gray-200 bg-gray-50 text-xs font-medium text-gray-950 focus:outline-none focus:border-gray-950 cursor-pointer">
                     <option value="">Any country</option>
                     @foreach($filters['countries'] as $c)
-                        <option value="{{ $c }}" @selected(request('country') === $c)>{{ $c }}</option>
+                        <option value="{{ $c['value'] }}" @selected(strcasecmp(request('country', ''), $c['value']) === 0)>{{ $c['label'] }}</option>
                     @endforeach
                 </select>
             </div>
@@ -93,11 +93,11 @@
                     @foreach($filters['regions'] as $r)
                         <label class="flex items-center justify-between cursor-pointer group">
                             <div class="flex items-center gap-2">
-                                <input type="radio" name="region" value="{{ $r }}"
-                                       @checked(request('region') === $r)
+                                <input type="radio" name="region" value="{{ $r['value'] }}"
+                                       @checked(strcasecmp(request('region', ''), $r['value']) === 0)
                                        onchange="this.form.submit()"
                                        class="w-3.5 h-3.5 accent-gray-950">
-                                <span class="text-xs font-medium text-gray-700 group-hover:text-gray-950 transition-colors">{{ $r }}</span>
+                                <span class="text-xs font-medium text-gray-700 group-hover:text-gray-950 transition-colors">{{ $r['label'] }}</span>
                             </div>
                         </label>
                     @endforeach
@@ -113,10 +113,10 @@
 
             {{-- 5. Inscription Era (Year Range) --}}
             <div class="px-5 py-4" x-data="{
-                min: {{ request('year_min', 1978) }},
-                max: {{ request('year_max', 2024) }},
-                absMin: 1978,
-                absMax: 2024,
+                min: {{ (int) request('year_min', $filters['year_min'] ?? 1978) }},
+                max: {{ (int) request('year_max', $filters['year_max'] ?? (int) date('Y')) }},
+                absMin: {{ $filters['year_min'] ?? 1978 }},
+                absMax: {{ $filters['year_max'] ?? (int) date('Y') }},
             }">
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Inscription Era</label>
                 <div class="flex items-center justify-between mb-2">
@@ -124,11 +124,11 @@
                     <span class="text-xs font-bold tabular-nums text-gray-950" x-text="max"></span>
                 </div>
                 <div class="space-y-2">
-                    <input type="range" name="year_min"
+                    <input type="range" name="year_min" aria-label="Earliest inscription year"
                            :min="absMin" :max="absMax" x-model.number="min"
                            @change="if(min > max) max = min"
                            class="w-full h-1 accent-gray-950 cursor-pointer">
-                    <input type="range" name="year_max"
+                    <input type="range" name="year_max" aria-label="Latest inscription year"
                            :min="absMin" :max="absMax" x-model.number="max"
                            @change="if(max < min) min = max"
                            class="w-full h-1 accent-gray-950 cursor-pointer">
@@ -140,10 +140,12 @@
             <div class="px-5 py-4">
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">UNESCO Criteria</label>
                 <div class="grid grid-cols-5 gap-1.5">
-                    @foreach(['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)', '(vii)', '(viii)', '(ix)', '(x)'] as $crit)
-                        <a href="{{ request()->fullUrlWithQuery(['criterion' => request('criterion') === $crit ? null : $crit, 'page' => 1]) }}"
+                    @php $activeCrit = trim(strtolower((string) request('criterion')), '() '); @endphp
+                    @foreach(['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'] as $code)
+                        @php $crit = '(' . $code . ')'; @endphp
+                        <a href="{{ request()->fullUrlWithQuery(['criterion' => $activeCrit === $code ? null : $code, 'page' => 1]) }}"
                            class="h-8 flex items-center justify-center rounded-lg border text-[10px] font-bold tabular-nums transition-colors
-                                  {{ request('criterion') === $crit
+                                  {{ $activeCrit === $code
                                       ? 'bg-gray-950 text-white border-gray-950'
                                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-950 hover:text-gray-950' }}">
                             {{ $crit }}

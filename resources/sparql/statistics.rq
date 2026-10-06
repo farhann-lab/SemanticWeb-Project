@@ -1,3 +1,12 @@
-PREFIX wh:<https://example.org/heritage/ontology/>
-SELECT ?category (COUNT(DISTINCT ?heritage) AS ?total) WHERE{
-?heritage a wh:WorldHeritageSite;wh:hasCategory ?category} GROUP BY ?category ORDER BY DESC(?total)
+PREFIX wh:   <https://example.org/heritage/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?category (COUNT(DISTINCT ?heritage) AS ?total)
+WHERE {
+    ?heritage a wh:WorldHeritageSite ;
+              wh:hasCategory ?cat .
+    ?cat rdfs:label ?category .
+    FILTER(LANG(?category) = "en")
+}
+GROUP BY ?category
+ORDER BY DESC(?total)

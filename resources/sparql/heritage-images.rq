@@ -1,7 +1,12 @@
 PREFIX wh: <https://example.org/heritage/ontology/>
 
-SELECT ?image ?imageUrl
+# Main image first, then the rest (the main image is not always repeated under wh:hasImage).
+SELECT DISTINCT ?image ?imageUrl
 WHERE {
-    wh:{{HERITAGE_ID}} wh:hasImage ?image .
+    wh:{{HERITAGE_ID}} (wh:hasMainImage|wh:hasImage) ?image .
     ?image wh:imageUrl ?imageUrl .
+    OPTIONAL { wh:{{HERITAGE_ID}} wh:hasMainImage ?main . FILTER(?main = ?image) }
+    BIND(IF(BOUND(?main), 0, 1) AS ?rank)
 }
+ORDER BY ?rank ?image
+LIMIT 12

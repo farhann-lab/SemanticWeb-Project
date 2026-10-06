@@ -1,0 +1,28 @@
+PREFIX wh:   <https://example.org/heritage/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo:  <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# One marker per site: coordinates come from the site's first component.
+SELECT ?heritage ?name
+    (SAMPLE(?la)  AS ?lat)
+    (SAMPLE(?lo)  AS ?lng)
+    (SAMPLE(?cat) AS ?category)
+    (SAMPLE(?cty) AS ?country)
+    (SAMPLE(?dng) AS ?danger)
+    (MIN(xsd:integer(STR(?y))) AS ?year)
+WHERE {
+    ?heritage a wh:WorldHeritageSite ;
+              rdfs:label ?name ;
+              wh:hasComponent ?comp .
+    FILTER(LANG(?name) = "en")
+    ?comp geo:lat ?la ;
+          geo:long ?lo .
+
+    OPTIONAL { ?heritage wh:hasCategory ?c . ?c rdfs:label ?cat . FILTER(LANG(?cat) = "en") }
+    OPTIONAL { ?heritage wh:locatedIn ?k . ?k rdfs:label ?cty . FILTER(LANG(?cty) = "en") }
+    OPTIONAL { ?heritage wh:isInDanger ?dng }
+    OPTIONAL { ?heritage wh:inscriptionYear ?y }
+}
+GROUP BY ?heritage ?name
+ORDER BY ?name

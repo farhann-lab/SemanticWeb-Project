@@ -1,18 +1,25 @@
-PREFIX wh: <https://example.org/heritage/ontology/>
+PREFIX wh:   <https://example.org/heritage/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT ?heritage ?name
+# Same category and at least one shared criterion, but NOT in the same country as the source
+# (same-country sites are already shown as "related").
+SELECT ?heritage ?name (COUNT(DISTINCT ?crit) AS ?shared)
 WHERE {
-    wh:{{HERITAGE_ID}} wh:locatedIn ?country ;
-                       wh:hasCategory ?category .
+    wh:{{HERITAGE_ID}} wh:hasCategory ?category ;
+                       wh:hasCriterion ?crit .
 
     ?heritage a wh:WorldHeritageSite ;
-              wh:locatedIn ?country ;
               wh:hasCategory ?category ;
+              wh:hasCriterion ?crit ;
               rdfs:label ?name .
 
     FILTER(?heritage != wh:{{HERITAGE_ID}})
     FILTER(LANG(?name) = "en")
+    FILTER NOT EXISTS {
+        wh:{{HERITAGE_ID}} wh:locatedIn ?c .
+        ?heritage wh:locatedIn ?c .
+    }
 }
-ORDER BY ?name
+GROUP BY ?heritage ?name
+ORDER BY DESC(?shared) ?name
 LIMIT 6

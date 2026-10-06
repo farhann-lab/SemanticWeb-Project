@@ -36,7 +36,8 @@ return [
     ],
 
     'fuseki' => [
-    'endpoint' => env('FUSEKI_ENDPOINT'),
+        'endpoint' => env('FUSEKI_ENDPOINT'),
+        'timeout'  => env('FUSEKI_TIMEOUT', 10),
     ],
 
 ];

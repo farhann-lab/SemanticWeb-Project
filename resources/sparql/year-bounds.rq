@@ -1,0 +1,5 @@
+PREFIX wh:  <https://example.org/heritage/ontology/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT (MIN(xsd:integer(STR(?y))) AS ?minYear) (MAX(xsd:integer(STR(?y))) AS ?maxYear)
+WHERE { ?s a wh:WorldHeritageSite ; wh:inscriptionYear ?y }

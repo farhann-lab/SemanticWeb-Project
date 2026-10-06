@@ -31,46 +31,53 @@ class HeritageService
     }
     public function getById(string $id): array
     {
-    $query = File::get(
-        resource_path('sparql/heritage-detail.rq')
-    );
+        $query = str_replace(
+            '{{HERITAGE_ID}}',
+            $this->safeId($id),
+            File::get(resource_path('sparql/heritage-detail.rq'))
+        );
 
-    $query = str_replace(
-        '{{HERITAGE_ID}}',
-        $id,
-        $query
-    );
+        $bindings = $this->sparql->bindings($this->sparql->query($query));
 
-    $result = $this->sparql->query($query);
+        if (empty($bindings)) {
+            return [];
+        }
 
-    $bindings = $result['results']['bindings'] ?? [];
+        $rows  = collect($bindings);
+        $first = $bindings[0];
 
-    if (empty($bindings)) {
-        return [];
+        $countries = $rows->pluck('countryLabel.value')->filter()->unique()->sort()->values()->all();
+
+        $romanOrder = array_flip(['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)', '(vii)', '(viii)', '(ix)', '(x)']);
+        $criteria   = $rows->pluck('criterionLabel.value')->filter()->unique()
+            ->sortBy(fn ($c) => $romanOrder[$c] ?? 99)->values()->all();
+
+        return [
+            'id'              => $id,
+            'name'            => strip_tags($first['name']['value'] ?? '-'),
+            'description'     => $first['description']['value'] ?? null,
+            'justification'   => $first['justification']['value'] ?? null,
+            'country'         => implode(', ', $countries),
+            'countries'       => $countries,
+            'region'          => $first['regionLabel']['value'] ?? '',
+            'category'        => $first['categoryLabel']['value'] ?? '',
+            'criteria'        => $criteria,
+            'inscriptionYear' => $first['inscriptionYear']['value'] ?? null,
+            'isInDanger'      => ($first['isInDanger']['value'] ?? 'false') === 'true',
+            'isTransboundary' => ($first['isTransboundary']['value'] ?? 'false') === 'true',
+            'areaHectares'    => isset($first['areaHectares']['value']) ? (float) $first['areaHectares']['value'] : null,
+        ];
     }
 
-    $first = $bindings[0];
+    /** Heritage ids end up inside SPARQL templates, so only the dataset's own id format is allowed. */
+    private function safeId(string $id): string
+    {
+        if (!preg_match('/^site_\d+$/', $id)) {
+            throw new \InvalidArgumentException('Invalid heritage id.');
+        }
 
-    return [
-        'id' => $id,
-        'name' => $first['name']['value'] ?? '-',
-        'description' => $first['description']['value'] ?? null,
-        'justification' => $first['justification']['value'] ?? null,
-        'country' => basename($first['country']['value'] ?? ''),
-        'region' => basename($first['region']['value'] ?? ''),
-        'category' => basename($first['category']['value'] ?? ''),
-        'criteria' => collect($bindings)
-            ->pluck('criterion.value')
-            ->map(fn ($value) => basename($value))
-            ->unique()
-            ->values()
-            ->all(),
-        'inscriptionYear' => $first['inscriptionYear']['value'] ?? null,
-        'isInDanger' => $first['isInDanger']['value'] ?? null,
-        'isTransboundary' => $first['isTransboundary']['value'] ?? null,
-        'areaHectares' => $first['areaHectares']['value'] ?? null,
-    ];
-   }
+        return $id;
+    }
 
     public function getImages(string $id): array
 {
@@ -80,7 +87,7 @@ class HeritageService
 
     $query = str_replace(
         '{{HERITAGE_ID}}',
-        $id,
+        $this->safeId($id),
         $query
     );
 
@@ -104,7 +111,7 @@ class HeritageService
 
     $query = str_replace(
         '{{HERITAGE_ID}}',
-        $id,
+        $this->safeId($id),
         $query
     );
 
@@ -115,7 +122,7 @@ class HeritageService
     )->map(function ($b) {
         return [
             'id' => basename($b['heritage']['value'] ?? ''),
-            'name' => $b['name']['value'] ?? '-',
+            'name' => strip_tags($b['name']['value'] ?? '-'),
         ];
     })->values()->all();
     }
@@ -128,7 +135,7 @@ class HeritageService
 
     $query = str_replace(
         '{{HERITAGE_ID}}',
-        $id,
+        $this->safeId($id),
         $query
     );
 
@@ -139,7 +146,7 @@ class HeritageService
     )->map(function ($b) {
         return [
             'id' => basename($b['heritage']['value'] ?? ''),
-            'name' => $b['name']['value'] ?? '-',
+            'name' => strip_tags($b['name']['value'] ?? '-'),
         ];
     })->values()->all();
     }
@@ -152,7 +159,7 @@ class HeritageService
 
     $query = str_replace(
         '{{HERITAGE_ID}}',
-        $id,
+        $this->safeId($id),
         $query
     );
 

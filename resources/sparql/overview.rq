@@ -1,0 +1,11 @@
+PREFIX wh: <https://example.org/heritage/ontology/>
+
+SELECT
+    (COUNT(DISTINCT ?site)    AS ?total)
+    (COUNT(DISTINCT ?country) AS ?countries)
+    (COUNT(DISTINCT ?region)  AS ?regions)
+WHERE {
+    ?site a wh:WorldHeritageSite .
+    OPTIONAL { ?site wh:locatedIn ?country }
+    OPTIONAL { ?site wh:belongsToRegion ?region }
+}

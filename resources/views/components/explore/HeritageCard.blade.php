@@ -13,6 +13,7 @@
     $connections  = $heritage['connections']  ?? 0;
     $name         = $heritage['name']         ?? 'Unknown Heritage';
     $id           = $heritage['id']           ?? '';
+    $image        = $heritage['image']        ?? null;
 
     $categoryUpper = strtoupper($category);
 
@@ -34,13 +35,19 @@
 
     {{-- Image Area --}}
     <div class="relative aspect-[4/3] bg-gray-100 overflow-hidden rounded-t-[23px]">
-        {{-- Placeholder image (replace with real source when available) --}}
-        <div class="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center group-hover:scale-105 transition-transform duration-350 ease-out">
+        {{-- Placeholder (shown when there is no image or it fails to load) --}}
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
             <svg class="w-12 h-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                 <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
         </div>
+
+        @if($image)
+            <img src="{{ $image }}" alt="{{ $name }}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                 onerror="this.remove()"
+                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-350 ease-out">
+        @endif
 
         {{-- Overlay gradient --}}
         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>

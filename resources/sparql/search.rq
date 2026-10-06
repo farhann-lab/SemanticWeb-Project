@@ -1,17 +1,15 @@
-PREFIX wh:<https://example.org/heritage/ontology/>
-PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
+PREFIX wh:   <https://example.org/heritage/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
 
-SELECT DISTINCT ?heritage ?name ?inscriptionYear
+SELECT DISTINCT ?heritage ?name ?yearNum
 WHERE {
     ?heritage a wh:WorldHeritageSite ;
               rdfs:label ?name .
+    FILTER(LANG(?name) = "en")
 
-    OPTIONAL {
-        ?heritage wh:inscriptionYear ?inscriptionYear
-    }
-
-    FILTER(LANG(?name)="en")
+    OPTIONAL { ?heritage wh:inscriptionYear ?inscriptionYear }
+    BIND(xsd:integer(STR(?inscriptionYear)) AS ?yearNum)
 
     {{CONDITIONS}}
 }

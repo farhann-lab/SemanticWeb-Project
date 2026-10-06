@@ -6,37 +6,20 @@ use App\Services\HeritageService;
 
 class HeritageController extends Controller
 {
-    public function index(HeritageService $heritageService)
+    public function show(string $id, HeritageService $heritageService)
     {
-        $data = $heritageService->getAll();
-
-        return view('heritage.index', compact('data'));
-    }
-
-    public function show(
-        string $id,
-        HeritageService $heritageService
-    ) { 
-       $data = $heritageService->getById($id);
-       $images = $heritageService->getImages($id);
-       $related = $heritageService->getRelated($id);
-       $recommendations = $heritageService->getRecommendations($id);
-       $components = $heritageService->getComponents($id);
+        $data = $heritageService->getById($id);
 
         if (empty($data)) {
             abort(404);
         }
 
-       return view(
-    'heritage.show',
-    compact(
-        'data',
-        'images',
-        'related',
-        'recommendations',
-        'components'
-    )
-    );
-    
-  }
-}  
+        return view('heritage.show', [
+            'data'            => $data,
+            'images'          => $heritageService->getImages($id),
+            'related'         => $heritageService->getRelated($id),
+            'recommendations' => $heritageService->getRecommendations($id),
+            'components'      => $heritageService->getComponents($id),
+        ]);
+    }
+}

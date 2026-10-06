@@ -1,5 +1,16 @@
-PREFIX wh:<https://example.org/heritage/ontology/>
-SELECT DISTINCT ?country ?region ?category ?criterion WHERE{
-?heritage a wh:WorldHeritageSite.
-OPTIONAL{?heritage wh:locatedIn ?country} OPTIONAL{?heritage wh:belongsToRegion ?region}
-OPTIONAL{?heritage wh:hasCategory ?category} OPTIONAL{?heritage wh:hasCriterion ?criterion}}
+PREFIX wh:   <https://example.org/heritage/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?type ?iri ?label
+WHERE {
+    VALUES (?type ?class) {
+        ("country"   wh:Country)
+        ("region"    wh:Region)
+        ("category"  wh:Category)
+        ("criterion" wh:Criterion)
+    }
+    ?iri a ?class ;
+         rdfs:label ?label .
+    FILTER(LANG(?label) = "en")
+    FILTER(?type != "country" || EXISTS { ?site wh:locatedIn ?iri })
+}

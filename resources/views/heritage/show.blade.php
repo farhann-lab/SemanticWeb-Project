@@ -1,242 +1,139 @@
 @extends('layouts.app')
 
+@section('title', $data['name'] . ' — HeritageFinder')
+
 @section('content')
+@php
+    $mainImage = $images[0]['url'] ?? null;
+    $gallery   = array_slice($images, 1);
+    $facts = [
+        'State Party'      => $data['country'] ?: '—',
+        'Region'           => $data['region'] ?: '—',
+        'Category'         => $data['category'] ?: '—',
+        'Inscribed'        => $data['inscriptionYear'] ?? '—',
+        'Area'             => $data['areaHectares'] !== null ? number_format($data['areaHectares'], 2) . ' ha' : '—',
+        'Transboundary'    => $data['isTransboundary'] ? 'Yes' : 'No',
+    ];
+@endphp
 
-<a href="/heritage" class="text-cyan-400 hover:text-cyan-300">
-    ← Kembali
-</a>
+<div class="max-w-[1100px] mx-auto px-4 md:px-8 py-8">
 
-<div class="mt-6 p-7 rounded-2xl bg-slate-900 border border-slate-800">
+    <a href="{{ url()->previous() !== url()->current() && str_contains(url()->previous(), '/search') ? url()->previous() : url('/search') }}"
+       class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-950 transition-colors">
+        ← Back to Explore
+    </a>
 
-    <p class="text-cyan-400 text-xs">
-        {{ $data['id'] }}
-    </p>
-
-    <h1 class="text-3xl font-bold mt-2">
-        {{ $data['name'] }}
-    </h1>
-
-    @if(!empty($data['description']))
-
-    <div class="mt-6">
-        <p class="text-slate-400 text-sm mb-2">
-            Description
+    {{-- Header --}}
+    <header class="mt-6">
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-gray-950 text-white">{{ $data['category'] ?: 'Heritage' }}</span>
+            @if($data['isInDanger'])
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-red-100 text-red-700">In Danger</span>
+            @endif
+            <span class="text-[11px] font-mono text-gray-400">wh:{{ $data['id'] }}</span>
+        </div>
+        <h1 class="mt-3 text-3xl md:text-5xl font-extrabold tracking-tight text-gray-950 leading-tight">{{ $data['name'] }}</h1>
+        <p class="mt-2 text-sm font-semibold text-gray-500">
+            {{ $data['country'] }}@if($data['region']) · {{ $data['region'] }}@endif
         </p>
+    </header>
 
-        <p class="text-slate-300 leading-7">
-            {{ $data['description'] }}
-        </p>
-    </div>
-
+    {{-- Hero image --}}
+    @if($mainImage)
+        <figure class="mt-8 rounded-[24px] overflow-hidden bg-gray-100 border border-gray-200">
+            <img src="{{ $mainImage }}" alt="{{ $data['name'] }}" referrerpolicy="no-referrer" class="w-full max-h-[520px] object-cover">
+        </figure>
     @endif
 
-    {{-- IMAGES --}}
-    @if(!empty($images))
-        <div class="mt-8">
-            <p class="text-slate-400 mb-3">
-                Images
-            </p>
+    {{-- Key facts --}}
+    <dl class="mt-8 grid grid-cols-2 md:grid-cols-3 gap-3">
+        @foreach($facts as $label => $value)
+            <div class="bg-white border border-gray-200 rounded-2xl px-5 py-4">
+                <dt class="text-[11px] font-bold uppercase tracking-wider text-gray-400">{{ $label }}</dt>
+                <dd class="mt-1 text-sm font-bold text-gray-950">{{ $value }}</dd>
+            </div>
+        @endforeach
+    </dl>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @foreach($images as $image)
-                    <a href="{{ $image['url'] }}" target="_blank">
-                        <img
-                            src="{{ $image['url'] }}"
-                            alt="{{ $data['name'] }}"
-                            class="w-full h-48 object-cover rounded-xl border border-slate-800 hover:opacity-80 transition"
-                        >
+    {{-- Criteria --}}
+    <section class="mt-8">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">UNESCO Criteria</h2>
+        <div class="flex flex-wrap gap-2 mt-3">
+            @forelse($data['criteria'] as $criterion)
+                <a href="{{ url('/search?criterion=' . trim($criterion, '()')) }}"
+                   class="text-xs font-bold tabular-nums text-gray-700 bg-gray-100 border border-gray-200 px-3 py-1 rounded-full hover:border-gray-950 transition-colors">{{ $criterion }}</a>
+            @empty
+                <span class="text-sm text-gray-400">No criteria recorded</span>
+            @endforelse
+        </div>
+    </section>
+
+    {{-- Description / justification --}}
+    @if(!empty($data['description']))
+        <section class="mt-10">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">Description</h2>
+            <p class="mt-3 text-gray-700 leading-7">{{ $data['description'] }}</p>
+        </section>
+    @endif
+
+    @if(!empty($data['justification']))
+        <section class="mt-10">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">Justification for Inscription</h2>
+            <div class="mt-3 text-gray-700 leading-7 whitespace-pre-line">{{ $data['justification'] }}</div>
+        </section>
+    @endif
+
+    {{-- Gallery --}}
+    @if(count($gallery))
+        <section class="mt-10">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">Gallery</h2>
+            <div class="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+                @foreach($gallery as $image)
+                    <a href="{{ $image['url'] }}" target="_blank" rel="noopener" class="block aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                        <img src="{{ $image['url'] }}" alt="{{ $data['name'] }} — photo {{ $loop->iteration }}" loading="lazy" referrerpolicy="no-referrer"
+                             onerror="this.parentElement.remove()"
+                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
                     </a>
                 @endforeach
             </div>
-        </div>
+        </section>
     @endif
 
-    <div class="grid md:grid-cols-2 gap-4 mt-8">
+    {{-- Components (graph: wh:hasComponent) --}}
+    @if(count($components))
+        <section class="mt-10">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">Components ({{ count($components) }})</h2>
+            <ul class="mt-3 grid md:grid-cols-2 gap-2">
+                @foreach($components as $component)
+                    <li class="bg-white border border-gray-200 rounded-xl px-4 py-3">
+                        <p class="text-sm font-semibold text-gray-950">{{ $component['name'] }}</p>
+                        <p class="text-[11px] font-mono text-gray-400 mt-0.5">{{ $component['id'] }}</p>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
 
-        <div class="p-4 bg-slate-800 rounded-xl">
-            <p class="text-xs text-slate-400">Country</p>
-            <p>{{ $data['country'] ?? '-' }}</p>
-        </div>
-
-        <div class="p-4 bg-slate-800 rounded-xl">
-            <p class="text-xs text-slate-400">Region</p>
-            <p>{{ $data['region'] ?? '-' }}</p>
-        </div>
-
-        <div class="p-4 bg-slate-800 rounded-xl">
-            <p class="text-xs text-slate-400">Category</p>
-            <p>{{ $data['category'] ?? '-' }}</p>
-        </div>
-
-        <div class="p-4 bg-slate-800 rounded-xl">
-            <p class="text-xs text-slate-400">Inscription Year</p>
-            <p>{{ $data['inscriptionYear'] ?? '-' }}</p>
-        </div>
-
-        <div class="p-4 bg-slate-800 rounded-xl">
-            <p class="text-xs text-slate-400">Area (Hectares)</p>
-            <p>{{ $data['areaHectares'] ?? '-' }}</p>
-        </div>
-
-        <div class="p-4 bg-slate-800 rounded-xl">
-            <p class="text-xs text-slate-400">In Danger</p>
-            <p>{{ $data['isInDanger'] === 'true' ? 'Yes' : 'No' }}</p>
-        </div>
-
-        <div class="p-4 bg-slate-800 rounded-xl">
-            <p class="text-xs text-slate-400">Transboundary</p>
-            <p>{{ $data['isTransboundary'] === 'true' ? 'Yes' : 'No' }}</p>
-        </div>
-
-    </div>
-
-    @if(count($components) > 0)
-
-    <section class="mt-8">
-
-        <h2 class="text-2xl font-bold mb-4">
-            Heritage Components
-        </h2>
-
-        <div class="grid md:grid-cols-2 gap-4">
-
-            @foreach($components as $component)
-
-                <div class="p-5 rounded-xl bg-slate-900 border border-slate-800">
-
-                    <p class="font-semibold">
-                        {{ $component['name'] }}
-                    </p>
-
-                    <p class="text-xs text-slate-500 mt-2">
-                        {{ $component['id'] }}
-                    </p>
-
+    {{-- Connected knowledge --}}
+    @foreach([
+        ['Related Heritage — same country', $related],
+        ['Recommended — same category & shared criteria', $recommendations],
+    ] as [$title, $items])
+        @if(!empty($items))
+            <section class="mt-10">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ $title }}</h2>
+                <div class="mt-3 grid md:grid-cols-3 gap-3">
+                    @foreach($items as $item)
+                        <a href="{{ url('/heritage/' . $item['id']) }}"
+                           class="bg-white border border-gray-200 rounded-2xl px-5 py-4 hover:border-gray-950 hover:-translate-y-0.5 transition-all">
+                            <p class="text-sm font-bold text-gray-950 leading-snug">{{ $item['name'] }}</p>
+                            <p class="text-[11px] font-mono text-gray-400 mt-2">{{ $item['id'] }}</p>
+                        </a>
+                    @endforeach
                 </div>
-
-            @endforeach
-
-        </div>
-
-    </section>
-
-    @endif
-
-    <div class="mt-8">
-
-        <p class="text-slate-400">
-            Criteria
-        </p>
-
-        <div class="flex flex-wrap gap-2 mt-3">
-
-            @forelse($data['criteria'] ?? [] as $criterion)
-
-                <span class="px-3 py-1 mr-2 mb-2 inline-block bg-cyan-500/10 text-cyan-300 rounded-full">
-                    {{ $criterion }}
-                </span>
-
-            @empty
-
-                <span class="text-slate-500">
-                    No criteria
-                </span>
-
-            @endforelse
-
-        </div>
-
-    </div>
-    @if(!empty($data['justification']))
-
-    <div class="mt-8">
-
-        <p class="text-slate-400 text-sm mb-2">
-            Justification
-        </p>
-
-        <div class="text-slate-300 leading-7 whitespace-pre-line">
-            {{ $data['justification'] }}
-        </div>
-
-    </div>
-
-    @endif
-
-        @if(!empty($related))
-
-    <div class="mt-10">
-
-        <p class="text-slate-400">
-            Related Heritage
-        </p>
-
-        <div class="grid md:grid-cols-3 gap-4 mt-4">
-
-            @foreach($related as $item)
-
-                <a
-                    href="/heritage/{{ $item['id'] }}"
-                    class="p-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition"
-                >
-
-                    <p class="font-semibold">
-                        {{ $item['name'] }}
-                    </p>
-
-                    <p class="text-xs text-slate-500 mt-2">
-                        {{ $item['id'] }}
-                    </p>
-
-                </a>
-
-            @endforeach
-
-        </div>
-
-
-        @if(!empty($recommendations))
-
-    <div class="mt-10">
-
-        <p class="text-slate-400">
-            Recommended Heritage
-        </p>
-
-        <div class="grid md:grid-cols-3 gap-4 mt-4">
-
-            @foreach($recommendations as $item)
-
-                <a
-                    href="/heritage/{{ $item['id'] }}"
-                    class="p-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition"
-                >
-
-                    <p class="font-semibold">
-                        {{ $item['name'] }}
-                    </p>
-
-                    <p class="text-xs text-slate-500 mt-2">
-                        {{ $item['id'] }}
-                    </p>
-
-                </a>
-
-            @endforeach
-
-        </div>
-
-    </div>
-
-@endif
-
-
-
-    </div>
-
- @endif
-
+            </section>
+        @endif
+    @endforeach
 
 </div>
-
 @endsection

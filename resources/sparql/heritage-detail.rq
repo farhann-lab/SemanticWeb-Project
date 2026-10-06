@@ -1,7 +1,7 @@
 PREFIX wh:   <https://example.org/heritage/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?name ?country ?region ?category ?criterion
+SELECT ?name ?countryLabel ?regionLabel ?categoryLabel ?criterionLabel
        ?inscriptionYear ?isInDanger ?isTransboundary
        ?areaHectares ?description ?justification
 WHERE {
@@ -9,48 +9,16 @@ WHERE {
 
     ?heritage a wh:WorldHeritageSite ;
               rdfs:label ?name .
-
-    OPTIONAL {
-        ?heritage wh:locatedIn ?country .
-    }
-
-    OPTIONAL {
-        ?heritage wh:belongsToRegion ?region .
-    }
-
-    OPTIONAL {
-        ?heritage wh:hasCategory ?category .
-    }
-
-    OPTIONAL {
-        ?heritage wh:hasCriterion ?criterion .
-    }
-
-    OPTIONAL {
-        ?heritage wh:inscriptionYear ?inscriptionYear .
-    }
-
-    OPTIONAL {
-        ?heritage wh:isInDanger ?isInDanger .
-    }
-
-    OPTIONAL {
-        ?heritage wh:isTransboundary ?isTransboundary .
-    }
-
-    OPTIONAL {
-        ?heritage wh:areaHectares ?areaHectares .
-    }
-
-    OPTIONAL {
-    ?heritage wh:description ?description .
-    FILTER(LANG(?description) = "en")
-    }
-
-    OPTIONAL {
-        ?heritage wh:justification ?justification .
-        FILTER(LANG(?justification) = "en")
-    }
-
     FILTER(LANG(?name) = "en")
+
+    OPTIONAL { ?heritage wh:locatedIn ?country . ?country rdfs:label ?countryLabel . FILTER(LANG(?countryLabel) = "en") }
+    OPTIONAL { ?heritage wh:belongsToRegion ?region . ?region rdfs:label ?regionLabel . FILTER(LANG(?regionLabel) = "en") }
+    OPTIONAL { ?heritage wh:hasCategory ?category . ?category rdfs:label ?categoryLabel . FILTER(LANG(?categoryLabel) = "en") }
+    OPTIONAL { ?heritage wh:hasCriterion ?criterion . ?criterion rdfs:label ?criterionLabel }
+    OPTIONAL { ?heritage wh:inscriptionYear ?inscriptionYear }
+    OPTIONAL { ?heritage wh:isInDanger ?isInDanger }
+    OPTIONAL { ?heritage wh:isTransboundary ?isTransboundary }
+    OPTIONAL { ?heritage wh:areaHectares ?areaHectares }
+    OPTIONAL { ?heritage wh:description ?description . FILTER(LANG(?description) = "en") }
+    OPTIONAL { ?heritage wh:justification ?justification . FILTER(LANG(?justification) = "en") }
 }
