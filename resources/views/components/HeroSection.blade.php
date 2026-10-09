@@ -26,7 +26,7 @@
             {{-- Layer 2: Midground Hutan --}}
             <div data-parallax-layer="2" class="absolute inset-0 w-full h-full">
                 <img 
-                    src="{{ asset('img/3.png') }}"  
+                    src="{{ asset('img/2.png') }}"  
                     alt="Heritage Forest Layer" 
                     class="w-full h-full object-cover opacity-80"
                 />
