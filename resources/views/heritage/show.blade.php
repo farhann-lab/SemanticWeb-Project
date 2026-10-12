@@ -16,7 +16,7 @@
     ];
 @endphp
 
-<div class="max-w-[1100px] mx-auto px-4 md:px-8 py-8">
+<div class="max-w-[1100px] mx-auto mt-5 px-4 md:px-8 py-8">
 
     <a href="{{ url()->previous() !== url()->current() && str_contains(url()->previous(), '/search') ? url()->previous() : url('/search') }}"
        class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-950 transition-colors">
