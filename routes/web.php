@@ -42,8 +42,8 @@ Route::get('/map', function () {
 // 4. Discover
 Route::get('/discover', fn () => redirect('/explore'))->name('discover');
 
-// 5. About
-Route::get('/about', fn () => view('welcome', ['stats' => []]))->name('about');
+// 5. About — dedicated About page with semantic architecture documentation
+Route::get('/about', fn () => view('about'))->name('about');
 
 // 6. Heritage detail (list view lives in Explore)
 Route::redirect('/heritage', '/explore')->name('heritage.index');
