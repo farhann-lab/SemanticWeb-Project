@@ -133,15 +133,27 @@ class SearchService
         $c = '';
 
         if (!empty($f['q'])) {
-            $kw = $this->lit($f['q']);
-            // match on heritage name OR on the name of a country it is located in
-            $c .= '
-                OPTIONAL { ?heritage wh:locatedIn ?qCountry . ?qCountry rdfs:label ?qCountryLabel . FILTER(LANG(?qCountryLabel) = "en") }
-                FILTER(
-                    CONTAINS(LCASE(STR(?name)), LCASE("' . $kw . '"))
-                    || CONTAINS(LCASE(STR(?qCountryLabel)), LCASE("' . $kw . '"))
-                )';
+    $kw = $this->lit($f['q']);
+
+    $c .= '
+        OPTIONAL {
+            ?heritage wh:locatedIn ?qCountry .
+            ?qCountry rdfs:label ?qCountryLabel .
+            FILTER(LANG(?qCountryLabel) = "en")
         }
+
+        OPTIONAL {
+            ?heritage wh:description ?description .
+        FILTER(LANG(?description) = "en")
+        }
+
+        FILTER(
+            CONTAINS(LCASE(STR(?name)), LCASE("' . $kw . '"))
+            || CONTAINS(LCASE(STR(?qCountryLabel)), LCASE("' . $kw . '"))
+            || CONTAINS(LCASE(STR(?description)), LCASE("' . $kw . '"))
+        )
+    ';
+}
 
         if (!empty($f['country']) && preg_match('/^[A-Za-z0-9]{2,6}$/', $f['country'])) {
             $c .= ' ?heritage wh:locatedIn wh:country_' . strtoupper($f['country']) . ' .';
