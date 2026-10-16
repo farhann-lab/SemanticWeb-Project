@@ -1,9 +1,10 @@
 PREFIX wh:   <https://example.org/heritage/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo:  <http://www.w3.org/2003/01/geo/wgs84_pos#>
 
 SELECT ?name ?countryLabel ?regionLabel ?categoryLabel ?criterionLabel
        ?inscriptionYear ?isInDanger ?isTransboundary
-       ?areaHectares ?description ?justification
+       ?areaHectares ?description ?justification ?lat ?lng
 WHERE {
     BIND(wh:{{HERITAGE_ID}} AS ?heritage)
 
@@ -21,4 +22,15 @@ WHERE {
     OPTIONAL { ?heritage wh:areaHectares ?areaHectares }
     OPTIONAL { ?heritage wh:description ?description . FILTER(LANG(?description) = "en") }
     OPTIONAL { ?heritage wh:justification ?justification . FILTER(LANG(?justification) = "en") }
+    OPTIONAL {
+        {
+            SELECT (SAMPLE(?cLat) AS ?lat) (SAMPLE(?cLng) AS ?lng)
+            WHERE {
+                wh:{{HERITAGE_ID}} wh:hasComponent ?comp .
+                ?comp geo:lat ?cLat ;
+                      geo:long ?cLng .
+            }
+        }
+    }
 }
+

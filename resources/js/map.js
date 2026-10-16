@@ -559,3 +559,127 @@ export function heritageMap() {
         }
     };
 }
+
+/**
+ * Alpine component for the Heritage Detail monochrome mini map (DET-3, DESIGN.md Section 4.8).
+ */
+export function heritageMiniMap(config = {}) {
+    return {
+        lat: config.lat !== undefined && config.lat !== null ? parseFloat(config.lat) : null,
+        lng: config.lng !== undefined && config.lng !== null ? parseFloat(config.lng) : null,
+        name: config.name || '',
+        category: (config.category || 'Cultural').toLowerCase(),
+        inDanger: !!config.inDanger,
+        map: null,
+        marker: null,
+
+        get hasValidCoordinates() {
+            return this.lat !== null &&
+                   this.lng !== null &&
+                   Number.isFinite(this.lat) &&
+                   Number.isFinite(this.lng) &&
+                   this.lat >= -90 && this.lat <= 90 &&
+                   this.lng >= -180 && this.lng <= 180;
+        },
+
+        init() {
+            if (!this.hasValidCoordinates) {
+                return;
+            }
+
+            this.$nextTick(() => {
+                this.initMap();
+            });
+        },
+
+        initMap() {
+            const container = this.$refs.miniMapContainer;
+            if (!container || this.map) return;
+
+            // Initialize compact Leaflet instance
+            this.map = L.map(container, {
+                center: [this.lat, this.lng],
+                zoom: 11,
+                minZoom: 3,
+                maxZoom: 17,
+                scrollWheelZoom: false, // Prevent wheel capture while scrolling the detail page
+                zoomControl: true,
+                attributionControl: true,
+            });
+
+            // Reposition zoom control to top-right
+            if (this.map.zoomControl) {
+                this.map.zoomControl.setPosition('topright');
+            }
+
+            // Tile Layer configuration (CARTO Positron or monochrome OSM fallback)
+            const cartoKey = import.meta.env.VITE_CARTO_API_KEY || '';
+            let tileUrl, tileAttribution, tileClassName = '';
+
+            if (cartoKey) {
+                tileUrl = `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(cartoKey)}`;
+                tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
+            } else {
+                tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OSM</a>';
+                tileClassName = 'monochrome-tile-layer';
+            }
+
+            L.tileLayer(tileUrl, {
+                attribution: tileAttribution,
+                subdomains: cartoKey ? 'abcd' : 'abc',
+                maxZoom: 18,
+                className: tileClassName,
+            }).addTo(this.map);
+
+            // Determine marker class based on category
+            let markerClass = 'heritage-marker-cultural';
+            if (this.category === 'natural') {
+                markerClass = 'heritage-marker-natural';
+            } else if (this.category === 'mixed') {
+                markerClass = 'heritage-marker-mixed';
+            }
+
+            const dangerPulseHtml = this.inDanger ? '<div class="heritage-marker-danger-pulse"></div>' : '';
+
+            const customIcon = L.divIcon({
+                className: 'custom-heritage-div-icon',
+                html: `
+                    <div class="heritage-marker-pin ${markerClass}" title="${escapeHtml(this.name)}">
+                        ${dangerPulseHtml}
+                    </div>
+                `,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8],
+            });
+
+            this.marker = L.marker([this.lat, this.lng], {
+                icon: customIcon,
+                alt: this.name,
+                keyboard: true,
+            }).addTo(this.map);
+
+            // Responsive size invalidation
+            window.addEventListener('resize', () => {
+                if (this.map) {
+                    this.map.invalidateSize();
+                }
+            });
+
+            // Slight delay invalidation to ensure container geometry is stabilized
+            setTimeout(() => {
+                if (this.map) {
+                    this.map.invalidateSize();
+                }
+            }, 200);
+        },
+
+        destroy() {
+            if (this.map) {
+                this.map.remove();
+                this.map = null;
+            }
+        }
+    };
+}
+

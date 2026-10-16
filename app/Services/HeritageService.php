@@ -52,6 +52,21 @@ class HeritageService
         $criteria   = $rows->pluck('criterionLabel.value')->filter()->unique()
             ->sortBy(fn ($c) => $romanOrder[$c] ?? 99)->values()->all();
 
+        $lat = isset($first['lat']['value']) && is_numeric($first['lat']['value']) ? (float) $first['lat']['value'] : null;
+        $lng = isset($first['lng']['value']) && is_numeric($first['lng']['value']) ? (float) $first['lng']['value'] : null;
+
+        // Ensure coordinates are strictly within valid earthly geographical bounds
+        if ($lat !== null && ($lat < -90 || $lat > 90)) {
+            $lat = null;
+        }
+        if ($lng !== null && ($lng < -180 || $lng > 180)) {
+            $lng = null;
+        }
+        if ($lat === null || $lng === null) {
+            $lat = null;
+            $lng = null;
+        }
+
         return [
             'id'              => $id,
             'name'            => strip_tags($first['name']['value'] ?? '-'),
@@ -66,8 +81,11 @@ class HeritageService
             'isInDanger'      => ($first['isInDanger']['value'] ?? 'false') === 'true',
             'isTransboundary' => ($first['isTransboundary']['value'] ?? 'false') === 'true',
             'areaHectares'    => isset($first['areaHectares']['value']) ? (float) $first['areaHectares']['value'] : null,
+            'lat'             => $lat,
+            'lng'             => $lng,
         ];
     }
+
 
     /** Heritage ids end up inside SPARQL templates, so only the dataset's own id format is allowed. */
     private function safeId(string $id): string

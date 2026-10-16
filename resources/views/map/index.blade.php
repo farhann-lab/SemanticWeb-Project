@@ -21,7 +21,7 @@
     {{-- ════════════════════════════════════════════════════════════════════
          1. FLOATING LOCATION SEARCH (MAP-5) - Top Center
          ════════════════════════════════════════════════════════════════════ --}}
-    <div class="absolute top-4 left-1/2 -translate-x-1/2 z-[400] w-[92%] sm:w-[420px] md:w-[480px]">
+    <div class="absolute top-15 left-1/2 -translate-x-1/2 z-[400] w-[92%] sm:w-[420px] md:w-[480px]">
         <div class="relative" @click.outside="showLocationDropdown = false">
             <div class="flex items-center h-12 bg-white/95 backdrop-blur-md rounded-full border border-gray-200 shadow-md px-4 gap-3 focus-within:border-gray-950 focus-within:ring-1 focus-within:ring-gray-950 transition-all duration-200">
                 <svg class="w-4 h-4 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

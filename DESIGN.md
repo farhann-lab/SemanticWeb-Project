@@ -394,7 +394,6 @@ Gabungan nuansa naratif Atlas Obscura dan struktur informasi UNESCO. Halaman dib
 | Aspek | Spesifikasi |
 | --- | --- |
 | **Layout** | Peta penuh lebar di bawah navbar (tinggi `100vh − tinggi navbar`). |
-| **Tile** | Gaya terang monokrom (abu-abu) agar menyatu dengan UI. Penyedia tile dan lisensinya **[TBD]**. |
 | **Marker** | Lingkaran 14px, latar hitam, ring putih 2px. Bentuk dibedakan kecil per kategori (isian untuk Cultural, outline untuk Natural, setengah terisi untuk Mixed). Marker In Danger memiliki ring luar berdenyut halus. |
 | **Cluster** | Lingkaran hitam dengan angka putih; ukuran tumbuh mengikuti jumlah. Klik memperbesar peta dengan animasi *fly-to* halus. |
 | **Popup** | Card mini radius `--radius-lg`, lebar ±280px: gambar kecil, nama, negara, badge kategori, tautan "View Details". Muncul dengan `scale 0.95→1` dan fade. |

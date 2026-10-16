@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 {{-- ════════════════════════════════════════════════════════════════════════
      TOP META BREADCRUMB
      ════════════════════════════════════════════════════════════════════════ --}}
-<div class="bg-white border-b border-gray-200 px-6 py-2.5">
+<div class="bg-white border-b border-gray-200 px-6 py-2.5 mt-20">
     <div class="max-w-6xl mx-auto">
         <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
             <a href="{{ url('/') }}" class="hover:text-gray-950 transition-colors">HeritageFinder</a>
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
 {{-- ════════════════════════════════════════════════════════════════════════
      STICKY ANCHOR NAVIGATION
      ════════════════════════════════════════════════════════════════════════ --}}
-<nav class="sticky top-[81px] z-40 bg-white/80 backdrop-blur-md border-b border-gray-200">
+<nav class="sticky top-[68px] z-40 bg-white/80 backdrop-blur-md border-b border-gray-200">
     <div class="max-w-6xl mx-auto px-6">
         <div class="flex items-center gap-0 overflow-x-auto">
             @foreach([

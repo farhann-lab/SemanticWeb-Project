@@ -1,11 +1,13 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
-import { heritageMap } from './map';
+import { heritageMap, heritageMiniMap } from './map';
 
 window.Alpine = Alpine;
 Alpine.data('heritageMap', heritageMap);
+Alpine.data('heritageMiniMap', heritageMiniMap);
 Alpine.start();
+
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';

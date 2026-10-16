@@ -98,7 +98,7 @@
     <x-Navbar />
 
     <main class="w-full pt-[5.5rem] bg-surface min-h-screen">
-        <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-6">
+        <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-6 mt-20">
 
             <!-- 1. Query ticker (response time is measured on the server) -->
             <section class="w-full bg-surface-container-low border border-gray-200 rounded-2xl px-6 py-3.5 mb-6">
