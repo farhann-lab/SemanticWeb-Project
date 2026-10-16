@@ -13,11 +13,6 @@
     z-index: 10;
 }
 
-/* Monochrome styling for fallback OpenStreetMap tiles (subtle, editorial gray) */
-.monochrome-tile-layer {
-    filter: grayscale(100%) contrast(92%) brightness(102%);
-}
-
 /* Base custom marker styling */
 .heritage-marker-pin {
     width: 14px;
