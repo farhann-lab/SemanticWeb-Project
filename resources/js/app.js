@@ -1,7 +1,10 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
+import { heritageMap } from './map';
+
 window.Alpine = Alpine;
+Alpine.data('heritageMap', heritageMap);
 Alpine.start();
 
 import gsap from 'gsap';

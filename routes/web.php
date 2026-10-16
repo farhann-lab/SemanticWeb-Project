@@ -36,8 +36,13 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 // 3. Map
 Route::get('/map', function () {
-    return view('parallax');
+    return view('map.index');
 })->name('map');
+
+// 3b. Parallax demo (preserved for reference)
+Route::get('/parallax-demo', function () {
+    return view('parallax');
+})->name('parallax.demo');
 
 // 4. Discover
 Route::get('/discover', fn () => redirect('/explore'))->name('discover');

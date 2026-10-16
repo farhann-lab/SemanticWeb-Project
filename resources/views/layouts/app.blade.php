@@ -19,12 +19,15 @@
     <x-Navbar />
 
     {{-- Main Page Content --}}
-    <main class="pt-[88px] w-full min-h-screen flex-1">
+    <main class="@yield('main-class', 'pt-[88px] w-full min-h-screen flex-1')">
         @yield('content')
     </main>
 
     {{-- Footer diletakkan di luar <main> agar bisa full-width --}}
-    <x-explore.Footer />
+    @hasSection('hide-footer')
+    @else
+        <x-explore.Footer />
+    @endif
 
 </body>
 </html>

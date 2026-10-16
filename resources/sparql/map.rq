@@ -10,6 +10,7 @@ SELECT ?heritage ?name
     (SAMPLE(?cat) AS ?category)
     (SAMPLE(?cty) AS ?country)
     (SAMPLE(?dng) AS ?danger)
+    (SAMPLE(?imgUrl) AS ?image)
     (MIN(xsd:integer(STR(?y))) AS ?year)
 WHERE {
     ?heritage a wh:WorldHeritageSite ;
@@ -23,6 +24,7 @@ WHERE {
     OPTIONAL { ?heritage wh:locatedIn ?k . ?k rdfs:label ?cty . FILTER(LANG(?cty) = "en") }
     OPTIONAL { ?heritage wh:isInDanger ?dng }
     OPTIONAL { ?heritage wh:inscriptionYear ?y }
+    OPTIONAL { ?heritage wh:hasMainImage ?mi . ?mi wh:imageUrl ?imgUrl }
 }
 GROUP BY ?heritage ?name
 ORDER BY ?name

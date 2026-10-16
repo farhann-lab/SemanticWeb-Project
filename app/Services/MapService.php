@@ -15,7 +15,7 @@ class MapService
      */
     public function markers(array $filter = []): array
     {
-        $all = Cache::remember('heritage.map.v1', now()->addHours(6), function () {
+        $all = Cache::remember('heritage.map.v2', now()->addHours(6), function () {
             return collect($this->sparql->bindings(
                 $this->sparql->query(File::get(resource_path('sparql/map.rq')))
             ))->map(fn ($b) => [
@@ -27,12 +27,16 @@ class MapService
                 'country'   => $b['country']['value'] ?? '',
                 'in_danger' => ($b['danger']['value'] ?? 'false') === 'true',
                 'year'      => isset($b['year']['value']) ? (int) $b['year']['value'] : null,
+                'image'     => $b['image']['value'] ?? null,
             ])->values();
         });
 
         return $all
             ->when(!empty($filter['category']), fn ($c) => $c->where('category', ucfirst(strtolower($filter['category']))))
             ->when(($filter['danger'] ?? '') === 'true', fn ($c) => $c->where('in_danger', true))
+            ->when(!empty($filter['country']), fn ($c) => $c->filter(
+                fn ($m) => stripos($m['country'], $filter['country']) !== false
+            ))
             ->when(!empty($filter['q']), fn ($c) => $c->filter(
                 fn ($m) => stripos($m['name'], $filter['q']) !== false || stripos($m['country'], $filter['q']) !== false
             ))

@@ -1,0 +1,207 @@
+/* ==========================================================================
+   HeritageFinder Interactive Map Styles (DESIGN.md Section 4.10)
+   Monochrome Editorial Aesthetics & Leaflet Customizations
+   ========================================================================== */
+
+/* Leaflet Container fill */
+.heritage-map-container {
+    width: 100%;
+    height: 100%;
+    background-color: #FAFAFA;
+    position: relative;
+    outline: none;
+    z-index: 10;
+}
+
+/* Monochrome styling for fallback OpenStreetMap tiles (subtle, editorial gray) */
+.monochrome-tile-layer {
+    filter: grayscale(100%) contrast(92%) brightness(102%);
+}
+
+/* Base custom marker styling */
+.heritage-marker-pin {
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(10, 10, 10, 0.25);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+}
+
+.heritage-marker-pin:hover {
+    transform: scale(1.3);
+}
+
+/* 1. Cultural: black-filled circular marker with white ring */
+.heritage-marker-cultural {
+    background-color: #0A0A0A;
+    border: 2px solid #FFFFFF;
+}
+
+/* 2. Natural: circular marker with black outline and light/white interior */
+.heritage-marker-natural {
+    background-color: #FFFFFF;
+    border: 2px solid #0A0A0A;
+}
+
+/* 3. Mixed: visually distinguishable half-filled marker (half black, half white) */
+.heritage-marker-mixed {
+    background: linear-gradient(90deg, #0A0A0A 50%, #FFFFFF 50%);
+    border: 2px solid #0A0A0A;
+}
+
+/* 4. In Danger: subtle outer ring with restrained pulse animation */
+.heritage-marker-danger-pulse {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    border: 2px solid rgba(10, 10, 10, 0.65);
+    animation: marker-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    pointer-events: none;
+}
+
+@keyframes marker-pulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.9;
+    }
+    70% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .heritage-marker-danger-pulse {
+        animation: none !important;
+        opacity: 0.4;
+        transform: scale(1.2);
+    }
+}
+
+/* Cluster styling: monochrome black circle with white numeric count */
+.heritage-cluster {
+    background: transparent !important;
+    border: none !important;
+}
+
+.heritage-cluster-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0A0A0A;
+    color: #FFFFFF;
+    border: 2px solid #FFFFFF;
+    border-radius: 9999px;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
+}
+
+.heritage-cluster-inner:hover {
+    transform: scale(1.1);
+    background-color: #262626;
+}
+
+/* Custom Popup styles (DESIGN.md Section 4.10) */
+.leaflet-popup-content-wrapper {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E5E5 !important;
+    border-radius: 20px !important; /* --radius-lg */
+    box-shadow: 0 12px 32px rgba(10, 10, 10, 0.12) !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    line-height: 1.5 !important;
+    min-width: 260px;
+    max-width: 300px;
+}
+
+.leaflet-popup-tip-container {
+    display: none !important; /* Clean floating aesthetic */
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+    top: 10px !important;
+    right: 10px !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 9999px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(4px) !important;
+    border: 1px solid #E5E5E5 !important;
+    color: #0A0A0A !important;
+    font-size: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.15s ease !important;
+    z-index: 30 !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+    background: #0A0A0A !important;
+    color: #FFFFFF !important;
+    border-color: #0A0A0A !important;
+}
+
+/* Custom Zoom Control in bottom right (DESIGN.md Section 4.10) */
+.leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 4px 16px rgba(10, 10, 10, 0.10) !important;
+    border-radius: 9999px !important;
+    overflow: hidden !important;
+    margin-right: 20px !important;
+    margin-bottom: 24px !important;
+}
+
+.leaflet-control-zoom a {
+    background-color: #FFFFFF !important;
+    color: #0A0A0A !important;
+    border-bottom: 1px solid #E5E5E5 !important;
+    width: 40px !important;
+    height: 40px !important;
+    line-height: 38px !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+}
+
+.leaflet-control-zoom a:last-child {
+    border-bottom: none !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background-color: #F5F5F5 !important;
+    color: #0A0A0A !important;
+}
+
+/* Leaflet Attribution styling */
+.leaflet-container .leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(4px) !important;
+    padding: 3px 10px !important;
+    border-top-left-radius: 8px !important;
+    font-size: 10px !important;
+    color: #525252 !important;
+}
+
+.leaflet-container .leaflet-control-attribution a {
+    color: #0A0A0A !important;
+    text-decoration: underline !important;
+}

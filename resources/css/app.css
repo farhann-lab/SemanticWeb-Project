@@ -7,6 +7,9 @@
 @source '../**/*.js';
 
 @import './global.css';
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import './map.css';
 
 @theme {
     --color-gray-0: #FFFFFF;

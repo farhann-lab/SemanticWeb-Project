@@ -57,6 +57,7 @@ class HeritageApiController extends Controller
         $filter = $request->validate([
             'category' => ['nullable', 'in:Cultural,Natural,Mixed,cultural,natural,mixed'],
             'danger'   => ['nullable', 'in:true,false'],
+            'country'  => ['nullable', 'string', 'max:100'],
             'q'        => ['nullable', 'string', 'max:100'],
         ]);
 
