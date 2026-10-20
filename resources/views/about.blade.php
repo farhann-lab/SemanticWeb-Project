@@ -93,7 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ['id' => 'about',        'label' => '01 — About'],
                 ['id' => 'data-sources', 'label' => '02 — Data Sources'],
                 ['id' => 'architecture', 'label' => '03 — Semantic Architecture'],
-                ['id' => 'ethos',        'label' => '04 — Ethos & Citation'],
+                ['id' => 'criteria',     'label' => '04 — Criteria Selection'],
+                ['id' => 'ethos',        'label' => '05 — Ethos & Citation'],
             ] as $anchor)
                 <a href="#{{ $anchor['id'] }}"
                    data-anchor="{{ $anchor['id'] }}"
@@ -380,7 +381,197 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 {{-- ════════════════════════════════════════════════════════════════════════
-     SECTION 04 — ETHOS & CITATION
+     SECTION 04 — CRITERIA SELECTION
+     ════════════════════════════════════════════════════════════════════════ --}}
+<section id="criteria" data-section="criteria"
+         class="bg-gray-50 py-20 md:py-28 border-t border-gray-200">
+    <div class="max-w-6xl mx-auto px-6 md:px-10">
+
+        {{-- Header --}}
+        <div class="reveal mb-4">
+            <span class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-4">
+                <span class="w-4 h-px bg-gray-300"></span>
+                04 — Criteria Selection
+            </span>
+            <h2 class="text-2xl md:text-4xl font-extrabold text-gray-950 tracking-tight leading-tight">
+                Kriteria Penetapan Situs Warisan Dunia UNESCO
+            </h2>
+            <p class="mt-4 text-base text-gray-500 max-w-2xl leading-relaxed">
+                UNESCO menetapkan situs warisan dunia berdasarkan 10 kriteria yang terbagi dalam
+                dua kategori besar — <strong class="text-gray-800">Budaya (i–vi)</strong> dan
+                <strong class="text-gray-800">Alam (vii–x)</strong>. Sebuah situs harus memenuhi
+                minimal satu kriteria untuk dapat dicalonkan.
+            </p>
+        </div>
+
+        {{-- Cultural Criteria --}}
+        <div class="reveal mt-12 mb-3">
+            <div class="inline-flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-lg bg-amber-700 text-white flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 10c-2.73 0-5.395.235-8 .688V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-amber-700">Kategori</p>
+                    <h3 class="text-base font-extrabold text-gray-950">Kriteria Budaya</h3>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                {{-- Criterion i --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-amber-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[13px] font-extrabold flex items-center justify-center">(i)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Mahakarya Kreatif Manusia</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Mewakili mahakarya kejeniusan kreatif manusia.
+                    </p>
+                </div>
+
+                {{-- Criterion ii --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-amber-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[13px] font-extrabold flex items-center justify-center">(ii)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Pertukaran Nilai Kemanusiaan</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Menunjukkan pertukaran penting nilai-nilai kemanusiaan, dalam perkembangan arsitektur atau teknologi, seni monumental, perencanaan kota, atau desain lanskap.
+                    </p>
+                </div>
+
+                {{-- Criterion iii --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-amber-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[13px] font-extrabold flex items-center justify-center">(iii)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Kesaksian Tradisi Budaya</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Memberikan kesaksian yang unik atau luar biasa mengenai suatu tradisi budaya atau peradaban yang masih hidup maupun yang telah punah.
+                    </p>
+                </div>
+
+                {{-- Criterion iv --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-amber-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[13px] font-extrabold flex items-center justify-center">(iv)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Contoh Arsitektur Bersejarah</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Menjadi contoh luar biasa dari suatu jenis bangunan, kompleks arsitektur atau teknologi, atau lanskap yang menggambarkan tahapan penting dalam sejarah manusia.
+                    </p>
+                </div>
+
+                {{-- Criterion v --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-amber-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[13px] font-extrabold flex items-center justify-center">(v)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Permukiman Tradisional</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Menjadi contoh luar biasa dari permukiman tradisional manusia, pemanfaatan lahan, atau pemanfaatan laut yang representatif terhadap suatu budaya, atau interaksi manusia dengan lingkungan.
+                    </p>
+                </div>
+
+                {{-- Criterion vi --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-amber-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[13px] font-extrabold flex items-center justify-center">(vi)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Keterkaitan dengan Tradisi Hidup</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Dikaitkan secara langsung atau nyata dengan peristiwa atau tradisi yang masih hidup, dengan gagasan, kepercayaan, atau karya seni dan sastra yang memiliki makna universal yang luar biasa.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        {{-- Natural Criteria --}}
+        <div class="reveal mt-10">
+            <div class="inline-flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Kategori</p>
+                    <h3 class="text-base font-extrabold text-gray-950">Kriteria Alam</h3>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-4">
+
+                {{-- Criterion vii --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-emerald-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-extrabold flex items-center justify-center">(vii)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Keindahan Alam Luar Biasa</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Mengandung fenomena alam yang luar biasa atau kawasan keindahan alam dan estetika yang penting.
+                    </p>
+                </div>
+
+                {{-- Criterion viii --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-emerald-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-extrabold flex items-center justify-center">(viii)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Sejarah Bumi & Geologi</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Menjadi contoh luar biasa yang mewakili tahapan penting dalam sejarah bumi, termasuk rekam jejak kehidupan, proses geologi, dan fitur geomorfologi.
+                    </p>
+                </div>
+
+                {{-- Criterion ix --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-emerald-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-extrabold flex items-center justify-center">(ix)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Ekosistem & Komunitas Biologis</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Menjadi contoh luar biasa yang mewakili proses ekologi dan biologis dalam evolusi serta perkembangan ekosistem terestrial, pesisir, laut, dan air tawar.
+                    </p>
+                </div>
+
+                {{-- Criterion x --}}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 group hover:border-emerald-300 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start gap-3 mb-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-extrabold flex items-center justify-center">(x)</span>
+                        <h4 class="text-sm font-bold text-gray-950 leading-snug pt-1">Konservasi Keanekaragaman Hayati</h4>
+                    </div>
+                    <p class="text-[13px] text-gray-500 leading-relaxed">
+                        Mengandung habitat penting bagi konservasi keanekaragaman hayati <em>in-situ</em>, termasuk spesies yang terancam punah dengan nilai universal yang luar biasa.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        {{-- Note --}}
+        <div class="reveal mt-10 border border-gray-200 rounded-2xl p-5 bg-white flex gap-4">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                </svg>
+            </div>
+            <p class="text-[13px] text-gray-500 leading-relaxed">
+                <strong class="text-gray-800">Catatan:</strong> Kriteria <strong>(vi)</strong> biasanya tidak digunakan sebagai satu-satunya dasar penetapan.
+                Situs dapat memenuhi lebih dari satu kriteria sekaligus — baik antar-budaya, antar-alam, maupun kombinasi keduanya (situs campuran / <em>mixed site</em>).
+                Sumber: <a href="https://whc.unesco.org/en/criteria/" target="_blank" rel="noopener noreferrer" class="text-gray-700 underline hover:text-gray-950">UNESCO WHC — The Criteria for Selection</a>.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+
+{{-- ════════════════════════════════════════════════════════════════════════
+     SECTION 05 — ETHOS & CITATION
      ════════════════════════════════════════════════════════════════════════ --}}
 <section id="ethos" data-section="ethos"
          class="bg-white py-20 md:py-28 border-t border-gray-200">
@@ -390,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="reveal mb-12">
             <span class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-4">
                 <span class="w-4 h-px bg-gray-300"></span>
-                04 — Ethos &amp; Citation
+                05 — Ethos &amp; Citation
             </span>
             <h2 class="text-2xl md:text-4xl font-extrabold text-gray-950 tracking-tight leading-tight">
                 Etika Data &amp; Transparansi

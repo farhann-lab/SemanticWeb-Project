@@ -9,9 +9,12 @@ SELECT ?heritage ?name
     (SAMPLE(?lo)  AS ?lng)
     (SAMPLE(?cat) AS ?category)
     (SAMPLE(?cty) AS ?country)
+    (SAMPLE(?regLabel) AS ?region)
     (SAMPLE(?dng) AS ?danger)
+    (SAMPLE(?trb) AS ?transboundary)
     (SAMPLE(?imgUrl) AS ?image)
     (MIN(xsd:integer(STR(?y))) AS ?year)
+    (GROUP_CONCAT(DISTINCT ?critLabel; SEPARATOR="|") AS ?criteria)
 WHERE {
     ?heritage a wh:WorldHeritageSite ;
               rdfs:label ?name ;
@@ -22,7 +25,10 @@ WHERE {
 
     OPTIONAL { ?heritage wh:hasCategory ?c . ?c rdfs:label ?cat . FILTER(LANG(?cat) = "en") }
     OPTIONAL { ?heritage wh:locatedIn ?k . ?k rdfs:label ?cty . FILTER(LANG(?cty) = "en") }
+    OPTIONAL { ?heritage wh:belongsToRegion ?reg . ?reg rdfs:label ?regLabel . FILTER(LANG(?regLabel) = "en") }
+    OPTIONAL { ?heritage wh:hasCriterion ?crit . ?crit rdfs:label ?critLabel }
     OPTIONAL { ?heritage wh:isInDanger ?dng }
+    OPTIONAL { ?heritage wh:isTransboundary ?trb }
     OPTIONAL { ?heritage wh:inscriptionYear ?y }
     OPTIONAL { ?heritage wh:hasMainImage ?mi . ?mi wh:imageUrl ?imgUrl }
 }

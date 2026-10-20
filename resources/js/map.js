@@ -47,8 +47,22 @@ export function heritageMap() {
         // Filters State
         selectedCategory: '',
         selectedCountry: '',
+        selectedRegion: '',
+        selectedCriterion: '',
+        yearMin: 1978,
+        yearMax: 2026,
+        absYearMin: 1978,
+        absYearMax: 2026,
         inDangerOnly: false,
+        transboundaryOnly: false,
         searchQuery: '',
+
+        // Marker Style Option: 'optionA' (Teardrop Modern Pin) or 'optionB' (Geometric Diamond)
+        markerStyle: 'optionA',
+
+        // Options lists
+        regions: [],
+        criteriaList: ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'],
 
         // Location Search (MAP-5) State
         locationQuery: '',
@@ -174,16 +188,41 @@ export function heritageMap() {
 
                 // Extract unique countries sorted alphabetically
                 const countrySet = new Set();
+                const regionSet = new Set();
+                let minYear = 2100;
+                let maxYear = 1970;
+
                 this.heritages.forEach(h => {
+                    // Extract unique countries
                     if (h.country && typeof h.country === 'string') {
-                        // In case countries are pipe-separated or comma-separated
                         h.country.split(/[,|]/).forEach(c => {
                             const trimmed = c.trim();
                             if (trimmed) countrySet.add(trimmed);
                         });
                     }
+
+                    // Extract unique regions
+                    if (h.region && typeof h.region === 'string') {
+                        const trimmedReg = h.region.trim();
+                        if (trimmedReg) regionSet.add(trimmedReg);
+                    }
+
+                    // Calculate year bounds
+                    if (h.year && Number.isInteger(h.year)) {
+                        if (h.year < minYear) minYear = h.year;
+                        if (h.year > maxYear) maxYear = h.year;
+                    }
                 });
+
                 this.countries = Array.from(countrySet).sort((a, b) => a.localeCompare(b));
+                this.regions = Array.from(regionSet).sort((a, b) => a.localeCompare(b));
+
+                if (minYear <= maxYear) {
+                    this.absYearMin = minYear;
+                    this.absYearMax = maxYear;
+                    this.yearMin = minYear;
+                    this.yearMax = maxYear;
+                }
 
                 // Render markers with current filters
                 this.applyFilters();
@@ -204,13 +243,17 @@ export function heritageMap() {
         },
 
         /**
-         * Apply client-side filters (Category, Country, In Danger, Keyword)
+         * Apply client-side filters (Category, Country, Region, Criteria, Era, In Danger, Transboundary)
          */
         applyFilters() {
             const cat = this.selectedCategory.toLowerCase();
             const country = this.selectedCountry.toLowerCase();
-            const q = this.searchQuery.trim().toLowerCase();
+            const region = this.selectedRegion.toLowerCase();
+            const crit = this.selectedCriterion.toLowerCase();
             const danger = this.inDangerOnly;
+            const transboundary = this.transboundaryOnly;
+            const yMin = this.yearMin;
+            const yMax = this.yearMax;
 
             this.filteredHeritages = this.heritages.filter(item => {
                 // Category match
@@ -226,16 +269,38 @@ export function heritageMap() {
                     }
                 }
 
+                // Region / Geographic Zone match
+                if (region) {
+                    const itemRegion = (item.region || '').toLowerCase();
+                    if (!itemRegion.includes(region)) {
+                        return false;
+                    }
+                }
+
                 // Danger match
                 if (danger && !item.in_danger) {
                     return false;
                 }
 
-                // Keyword match
-                if (q) {
-                    const name = (item.name || '').toLowerCase();
-                    const cty = (item.country || '').toLowerCase();
-                    if (!name.includes(q) && !cty.includes(q)) {
+                // Transboundary match
+                if (transboundary && !item.transboundary) {
+                    return false;
+                }
+
+                // UNESCO Criteria match (e.g. 'i', 'ii', etc.)
+                if (crit) {
+                    const itemCriteria = Array.isArray(item.criteria)
+                        ? item.criteria.map(c => String(c).toLowerCase().trim())
+                        : [];
+                    const matchesCrit = itemCriteria.some(c => c === crit || c.includes(`(${crit})`) || c === `criterion_${crit}`);
+                    if (!matchesCrit) {
+                        return false;
+                    }
+                }
+
+                // Inscription Era (Year) match
+                if (item.year) {
+                    if (item.year < yMin || item.year > yMax) {
                         return false;
                     }
                 }
@@ -264,28 +329,80 @@ export function heritageMap() {
                 const cat = (item.category || '').toLowerCase();
                 const inDanger = !!item.in_danger;
 
-                // Determine marker class based on category
-                let markerClass = 'heritage-marker-cultural';
-                if (cat === 'natural') {
-                    markerClass = 'heritage-marker-natural';
-                } else if (cat === 'mixed') {
-                    markerClass = 'heritage-marker-mixed';
+                let customIcon;
+
+                if (this.markerStyle === 'optionB') {
+                    // Option B: Geometric Diamond Badge
+                    let diamondClass = 'heritage-diamond-cultural';
+                    let symbol = '🏛';
+                    if (cat === 'natural') {
+                        diamondClass = 'heritage-diamond-natural';
+                        symbol = '🌿';
+                    } else if (cat === 'mixed') {
+                        diamondClass = 'heritage-diamond-mixed';
+                        symbol = '✦';
+                    }
+
+                    const dangerPulseHtml = inDanger ? '<div class="heritage-pin-danger-ring"></div>' : '';
+
+                    customIcon = L.divIcon({
+                        className: 'custom-heritage-div-icon',
+                        html: `
+                            <div class="heritage-diamond-wrapper ${diamondClass}" title="${escapeHtml(item.name)}">
+                                ${dangerPulseHtml}
+                                <span class="heritage-diamond-inner">${symbol}</span>
+                            </div>
+                        `,
+                        iconSize: [22, 22],
+                        iconAnchor: [11, 11],
+                        popupAnchor: [0, -14],
+                    });
+                } else {
+                    // Option A: Teardrop Modern Pin with Category Icons (Default)
+                    let pinColor = '#582E16'; // Cultural: Warm Brown (#582E16)
+                    let innerSvgIcon = `
+                        <!-- Temple Columns (Cultural) - centered in 24x24 box -->
+                        <path d="M4 10h16M4 18h16M7 10v8M12 10v8M17 10v8M12 4l9 5H3l9-5z" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    `;
+
+                    if (cat === 'natural') {
+                        pinColor = '#059669'; // Natural: Emerald Jade Green
+                        innerSvgIcon = `
+                            <!-- Leaf (Natural) - centered in 24x24 box -->
+                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+                            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+                        `;
+                    } else if (cat === 'mixed') {
+                        pinColor = '#6366F1'; // Mixed: Royal Indigo / Purple
+                        innerSvgIcon = `
+                            <!-- Sparkle Star (Mixed) - centered in 24x24 box -->
+                            <path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z" fill="#FFFFFF"/>
+                        `;
+                    }
+
+                    const dangerPulseHtml = inDanger ? '<div class="heritage-pin-danger-ring"></div>' : '';
+
+                    customIcon = L.divIcon({
+                        className: 'custom-heritage-div-icon',
+                        html: `
+                            <div class="heritage-pin-wrapper" title="${escapeHtml(item.name)}">
+                                ${dangerPulseHtml}
+                                <svg class="heritage-pin-body" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Teardrop Pin Silhouette: Head center is exactly at (14, 14) with radius 14 -->
+                                    <path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 20 14 20s14-9.5 14-20c0-7.732-6.268-14-14-14z" fill="${pinColor}"/>
+                                    <path d="M14 1C6.82 1 1 6.82 1 14c0 9.8 13 18.5 13 18.5S27 23.8 27 14c0-7.18-5.82-13-13-13z" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.85"/>
+                                    <!-- Inner icon perfectly centered at (14, 14): translate(6.2, 6.2) scale(0.65) maps 24x24 to 15.6x15.6 centered in circle -->
+                                    <g transform="translate(6.2, 6.2) scale(0.65)">
+                                        ${innerSvgIcon}
+                                    </g>
+                                </svg>
+                            </div>
+                        `,
+                        iconSize: [28, 34],
+                        iconAnchor: [14, 34], // bottom tip points directly at the coordinates
+                        popupAnchor: [0, -32],
+                    });
                 }
-
-                // Danger pulse ring
-                const dangerPulseHtml = inDanger ? '<div class="heritage-marker-danger-pulse"></div>' : '';
-
-                const customIcon = L.divIcon({
-                    className: 'custom-heritage-div-icon',
-                    html: `
-                        <div class="heritage-marker-pin ${markerClass}" title="${escapeHtml(item.name)}">
-                            ${dangerPulseHtml}
-                        </div>
-                    `,
-                    iconSize: [14, 14],
-                    iconAnchor: [7, 7],
-                    popupAnchor: [0, -10],
-                });
 
                 const marker = L.marker([lat, lng], { icon: customIcon });
 
@@ -464,10 +581,15 @@ export function heritageMap() {
          * Location search (MAP-5) input handler
          */
         onLocationInput() {
-            const q = this.locationQuery.trim().toLowerCase();
+            const rawQ = this.locationQuery.trim();
+            const q = rawQ.toLowerCase();
             this.selectedIndex = -1;
 
-            if (q.length < 2) {
+            // Also synchronize with marker search filter so typing immediately highlights or narrows markers if desired
+            this.searchQuery = rawQ;
+            this.applyFilters();
+
+            if (q.length < 1) {
                 this.locationSuggestions = [];
                 this.showLocationDropdown = false;
                 return;
@@ -481,35 +603,55 @@ export function heritageMap() {
 
                 if (name.includes(q) || country.includes(q)) {
                     matches.push(h);
-                    if (matches.length >= 8) break; // Top 8 suggestions
+                    if (matches.length >= 10) break; // Top 10 suggestions
                 }
             }
 
             this.locationSuggestions = matches;
-            this.showLocationDropdown = true;
+            this.showLocationDropdown = matches.length > 0;
+        },
+
+        /**
+         * Perform search on Enter when user presses enter in search input
+         */
+        performSearch() {
+            if (this.locationSuggestions.length > 0) {
+                const target = this.selectedIndex >= 0 && this.selectedIndex < this.locationSuggestions.length
+                    ? this.locationSuggestions[this.selectedIndex]
+                    : this.locationSuggestions[0];
+                this.selectLocation(target);
+            } else if (this.filteredHeritages.length > 0) {
+                const first = this.filteredHeritages[0];
+                this.selectLocation(first);
+            }
         },
 
         /**
          * Select a location suggestion (MAP-5)
          */
         selectLocation(item) {
+            if (!item) return;
             this.locationQuery = item.name;
+            this.searchQuery = ''; // Clear keyword constraint so user can explore surrounding area
             this.showLocationDropdown = false;
             this.selectedIndex = -1;
 
             const lat = parseFloat(item.lat);
             const lng = parseFloat(item.lng);
-            this.flyToAndOpenMarker(item.id, lat, lng, 12);
+            this.flyToAndOpenMarker(item.id, lat, lng, 13);
         },
 
         /**
          * Keyboard navigation for location search suggestions
          */
         onLocationKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.performSearch();
+                return;
+            }
+
             if (!this.showLocationDropdown || this.locationSuggestions.length === 0) {
-                if (event.key === 'Enter') {
-                    this.onLocationInput();
-                }
                 return;
             }
 
@@ -521,13 +663,6 @@ export function heritageMap() {
                 this.selectedIndex = this.selectedIndex <= 0
                     ? this.locationSuggestions.length - 1
                     : this.selectedIndex - 1;
-            } else if (event.key === 'Enter') {
-                event.preventDefault();
-                if (this.selectedIndex >= 0 && this.selectedIndex < this.locationSuggestions.length) {
-                    this.selectLocation(this.locationSuggestions[this.selectedIndex]);
-                } else if (this.locationSuggestions.length > 0) {
-                    this.selectLocation(this.locationSuggestions[0]);
-                }
             } else if (event.key === 'Escape') {
                 this.showLocationDropdown = false;
             }
@@ -539,7 +674,12 @@ export function heritageMap() {
         clearAllFilters() {
             this.selectedCategory = '';
             this.selectedCountry = '';
+            this.selectedRegion = '';
+            this.selectedCriterion = '';
+            this.yearMin = this.absYearMin;
+            this.yearMax = this.absYearMax;
             this.inDangerOnly = false;
+            this.transboundaryOnly = false;
             this.searchQuery = '';
             this.locationQuery = '';
             this.showLocationDropdown = false;
@@ -555,7 +695,25 @@ export function heritageMap() {
          * Check if any filter is active
          */
         get hasActiveFilters() {
-            return !!(this.selectedCategory || this.selectedCountry || this.inDangerOnly || this.searchQuery);
+            return !!(
+                this.selectedCategory ||
+                this.selectedCountry ||
+                this.selectedRegion ||
+                this.selectedCriterion ||
+                this.inDangerOnly ||
+                this.transboundaryOnly ||
+                this.yearMin > this.absYearMin ||
+                this.yearMax < this.absYearMax ||
+                this.searchQuery
+            );
+        },
+
+        /**
+         * Toggle between Option A (Teardrop Pin) and Option B (Geometric Diamond)
+         */
+        setMarkerStyle(style) {
+            this.markerStyle = style;
+            this.renderMarkers();
         }
     };
 }
@@ -587,9 +745,25 @@ export function heritageMiniMap(config = {}) {
                 return;
             }
 
-            this.$nextTick(() => {
-                this.initMap();
-            });
+            const container = this.$refs.miniMapContainer;
+            if (!container) return;
+
+            // Use IntersectionObserver to lazy-init map only when visible
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            observer.disconnect();
+                            this.initMap();
+                        }
+                    });
+                }, { rootMargin: '200px' });
+                observer.observe(container);
+            } else {
+                this.$nextTick(() => {
+                    this.initMap();
+                });
+            }
         },
 
         initMap() {
@@ -632,25 +806,46 @@ export function heritageMiniMap(config = {}) {
                 className: tileClassName,
             }).addTo(this.map);
 
-            // Determine marker class based on category
-            let markerClass = 'heritage-marker-cultural';
+            // Determine pin color and inner icon based on category
+            let pinColor = '#0F172A'; // Cultural: Obsidian slate
+            let innerSvgIcon = `
+                <!-- Temple Pillar (Cultural) -->
+                <path d="M2 20h20M4 20V9M8 20V9M12 20V9M16 20V9M20 20V9M2 9l10-5 10 5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            `;
+
             if (this.category === 'natural') {
-                markerClass = 'heritage-marker-natural';
+                pinColor = '#059669'; // Natural: Forest Emerald
+                innerSvgIcon = `
+                    <!-- Leaf (Natural) -->
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+                `;
             } else if (this.category === 'mixed') {
-                markerClass = 'heritage-marker-mixed';
+                pinColor = '#6366F1'; // Mixed: Indigo
+                innerSvgIcon = `
+                    <!-- Sparkle Star (Mixed) -->
+                    <path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z" fill="#FFFFFF"/>
+                `;
             }
 
-            const dangerPulseHtml = this.inDanger ? '<div class="heritage-marker-danger-pulse"></div>' : '';
+            const dangerPulseHtml = this.inDanger ? '<div class="heritage-pin-danger-ring"></div>' : '';
 
             const customIcon = L.divIcon({
                 className: 'custom-heritage-div-icon',
                 html: `
-                    <div class="heritage-marker-pin ${markerClass}" title="${escapeHtml(this.name)}">
+                    <div class="heritage-pin-wrapper" title="${escapeHtml(this.name)}">
                         ${dangerPulseHtml}
+                        <svg class="heritage-pin-body" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 20 14 20s14-9.5 14-20c0-7.732-6.268-14-14-14z" fill="${pinColor}"/>
+                            <path d="M14 1C6.82 1 1 6.82 1 14c0 9.8 13 18.5 13 18.5S27 23.8 27 14c0-7.18-5.82-13-13-13z" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.85"/>
+                            <g transform="translate(6.2, 6.2) scale(0.65)">
+                                ${innerSvgIcon}
+                            </g>
+                        </svg>
                     </div>
                 `,
-                iconSize: [16, 16],
-                iconAnchor: [8, 8],
+                iconSize: [28, 34],
+                iconAnchor: [14, 34],
             });
 
             this.marker = L.marker([this.lat, this.lng], {

@@ -61,7 +61,7 @@
                     @endphp
                     @foreach($categories as $val => $label)
                         <a href="{{ request()->fullUrlWithQuery(['category' => $val, 'page' => 1]) }}"
-                           class="h-7 px-3 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors
+                           class="h-7 px-3 pt-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors
                                   {{ strcasecmp(request('category', ''), (string) $val) === 0
                                       ? 'bg-gray-950 text-white border-gray-950'
                                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-950 hover:text-gray-950' }}">

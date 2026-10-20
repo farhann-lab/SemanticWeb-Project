@@ -15,18 +15,26 @@
 </head>
 <body class="bg-white text-gray-950 min-h-screen antialiased flex flex-col justify-between">
 
-    {{-- Modular Airbnb-inspired Navbar --}}
-    <x-Navbar />
-
-    {{-- Main Page Content --}}
-    <main class="@yield('main-class', 'pt-[88px] w-full min-h-screen flex-1')">
-        @yield('content')
-    </main>
-
-    {{-- Footer diletakkan di luar <main> agar bisa full-width --}}
-    @hasSection('hide-footer')
+    @hasSection('full-content')
+        @yield('full-content')
     @else
-        <x-explore.Footer />
+        {{-- Modular Airbnb-inspired Navbar or custom page navbar --}}
+        @hasSection('navbar')
+            @yield('navbar')
+        @else
+            <x-Navbar />
+        @endif
+
+        {{-- Main Page Content --}}
+        <main class="@yield('main-class', 'pt-[88px] w-full min-h-screen flex-1')">
+            @yield('content')
+        </main>
+
+        {{-- Footer diletakkan di luar <main> agar bisa full-width --}}
+        @hasSection('hide-footer')
+        @else
+            <x-explore.Footer />
+        @endif
     @endif
 
 </body>

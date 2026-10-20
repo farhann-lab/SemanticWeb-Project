@@ -13,72 +13,130 @@
     z-index: 10;
 }
 
-/* Base custom marker styling */
-.heritage-marker-pin {
-    width: 14px;
-    height: 14px;
-    border-radius: 9999px;
+/* ==========================================================================
+   MARKER STYLES (OPTION A: Teardrop Modern Pin with Category Icons - Active)
+   ========================================================================== */
+
+.custom-heritage-div-icon {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Option A: Teardrop Pin Container */
+.heritage-pin-wrapper {
     position: relative;
-    box-shadow: 0 2px 6px rgba(10, 10, 10, 0.25);
-    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
     cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.28));
 }
 
-.heritage-marker-pin:hover {
-    transform: scale(1.3);
+.heritage-pin-wrapper:hover {
+    transform: translateY(-4px) scale(1.15);
+    z-index: 1000 !important;
 }
 
-/* 1. Cultural: black-filled circular marker with white ring */
-.heritage-marker-cultural {
-    background-color: #0A0A0A;
-    border: 2px solid #FFFFFF;
+.heritage-pin-body {
+    width: 28px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* 2. Natural: circular marker with black outline and light/white interior */
-.heritage-marker-natural {
-    background-color: #FFFFFF;
-    border: 2px solid #0A0A0A;
+/* Cultural: Obsidian Dark Slate with pillar temple icon */
+.heritage-pin-cultural {
+    color: #582e16;
 }
 
-/* 3. Mixed: visually distinguishable half-filled marker (half black, half white) */
-.heritage-marker-mixed {
-    background: linear-gradient(90deg, #0A0A0A 50%, #FFFFFF 50%);
-    border: 2px solid #0A0A0A;
+/* Natural: Emerald Jade Green with leaf icon */
+.heritage-pin-natural {
+    color: #059669;
 }
 
-/* 4. In Danger: subtle outer ring with restrained pulse animation */
-.heritage-marker-danger-pulse {
+/* Mixed: Royal Purple / Indigo with star split icon */
+.heritage-pin-mixed {
+    color: #6366F1;
+}
+
+/* Danger Pulse Ring for Option A */
+.heritage-pin-danger-ring {
     position: absolute;
-    top: -6px;
-    left: -6px;
-    width: 26px;
-    height: 26px;
+    top: -4px;
+    left: -4px;
+    width: 36px;
+    height: 36px;
     border-radius: 9999px;
-    border: 2px solid rgba(10, 10, 10, 0.65);
+    border: 2px solid #EF4444;
     animation: marker-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
     pointer-events: none;
 }
 
+/* ==========================================================================
+   OPTION B: Geometric Diamond / Badge (Can be toggled via JS or used as alternative)
+   ========================================================================== */
+.heritage-diamond-wrapper {
+    width: 22px;
+    height: 22px;
+    position: relative;
+    cursor: pointer;
+    transform: rotate(45deg);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.heritage-diamond-wrapper:hover {
+    transform: rotate(45deg) scale(1.25);
+    z-index: 1000 !important;
+}
+
+.heritage-diamond-cultural {
+    background-color: #0F172A;
+    border: 2px solid #FFFFFF;
+}
+
+.heritage-diamond-natural {
+    background-color: #059669;
+    border: 2px solid #FFFFFF;
+}
+
+.heritage-diamond-mixed {
+    background-color: #6366F1;
+    border: 2px solid #FFFFFF;
+}
+
+.heritage-diamond-inner {
+    transform: rotate(-45deg);
+    color: #FFFFFF;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @keyframes marker-pulse {
     0% {
-        transform: scale(0.9);
+        transform: scale(0.85);
         opacity: 0.9;
     }
     70% {
-        transform: scale(1.5);
+        transform: scale(1.4);
         opacity: 0;
     }
     100% {
-        transform: scale(1.5);
+        transform: scale(1.4);
         opacity: 0;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .heritage-marker-danger-pulse {
+    .heritage-pin-danger-ring {
         animation: none !important;
-        opacity: 0.4;
-        transform: scale(1.2);
+        opacity: 0.5;
+        transform: scale(1.1);
     }
 }
 

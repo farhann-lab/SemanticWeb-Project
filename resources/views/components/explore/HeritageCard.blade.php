@@ -45,8 +45,9 @@
 
         @if($image)
             <img src="{{ $image }}" alt="{{ $name }}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                 onerror="this.remove()"
-                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-350 ease-out">
+                 onerror="this.style.display='none'"
+                 onload="this.classList.remove('opacity-0')"
+                 class="opacity-0 transition-opacity duration-300 absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-350 ease-out">
         @endif
 
         {{-- Overlay gradient --}}

@@ -63,8 +63,8 @@
 
     {{-- Hero image --}}
     @if($mainImage)
-        <figure class="mt-8 rounded-[24px] overflow-hidden bg-gray-100 border border-gray-200">
-            <img src="{{ $mainImage }}" alt="{{ $data['name'] }}" referrerpolicy="no-referrer" class="w-full max-h-[520px] object-cover">
+        <figure class="mt-8 rounded-[24px] overflow-hidden bg-gray-100 border border-gray-200 aspect-[16/9] max-h-[520px] relative">
+            <img src="{{ $mainImage }}" alt="{{ $data['name'] }}" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" class="w-full h-full object-cover">
         </figure>
     @endif
 
@@ -83,7 +83,7 @@
         <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">UNESCO Criteria</h2>
         <div class="flex flex-wrap gap-2 mt-3">
             @forelse($data['criteria'] as $criterion)
-                <a href="{{ url('/search?criterion=' . trim($criterion, '()')) }}"
+                <a href="{{ url('/about') }}"
                    class="text-xs font-bold tabular-nums text-gray-700 bg-gray-100 border border-gray-200 px-3 py-1 rounded-full hover:border-gray-950 transition-colors">{{ $criterion }}</a>
             @empty
                 <span class="text-sm text-gray-400">No criteria recorded</span>
@@ -106,18 +106,171 @@
         </section>
     @endif
 
-    {{-- Gallery --}}
+    {{-- Gallery Carousel --}}
     @if(count($gallery))
-        <section class="mt-10">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400">Gallery</h2>
-            <div class="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
-                @foreach($gallery as $image)
-                    <a href="{{ $image['url'] }}" target="_blank" rel="noopener" class="block aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                        <img src="{{ $image['url'] }}" alt="{{ $data['name'] }} — photo {{ $loop->iteration }}" loading="lazy" referrerpolicy="no-referrer"
-                             onerror="this.parentElement.remove()"
-                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-                    </a>
-                @endforeach
+        <section class="mt-12 pt-8 border-t border-gray-200"
+                 style="content-visibility: auto; contain-intrinsic-size: 500px;"
+                 x-data="{
+                     active: 0,
+                     total: {{ count($gallery) }},
+                     images: {{ json_encode(array_values(array_map(fn($g) => $g['url'], $gallery))) }},
+                     lightboxOpen: false,
+                     loadedThumbs: [0, 1, 2, 3],
+                     next() {
+                         this.active = (this.active + 1) % this.total;
+                         this.ensureThumbLoaded(this.active);
+                     },
+                     prev() {
+                         this.active = (this.active - 1 + this.total) % this.total;
+                         this.ensureThumbLoaded(this.active);
+                     },
+                     ensureThumbLoaded(index) {
+                         if (!this.loadedThumbs.includes(index)) {
+                             this.loadedThumbs.push(index);
+                         }
+                     }
+                 }"
+                 @keydown.arrow-right.window="if(lightboxOpen) next()"
+                 @keydown.arrow-left.window="if(lightboxOpen) prev()"
+                 @keydown.escape.window="lightboxOpen = false">
+
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">ARCHIVAL GALLERY</span>
+                    <h2 class="text-xl md:text-2xl font-extrabold tracking-tight text-gray-950 mt-1">
+                        Gallery
+                        <span class="text-xs font-semibold text-gray-500 ml-1.5 tabular-nums" x-text="'(' + (active + 1) + ' of ' + total + ')'"></span>
+                    </h2>
+                </div>
+
+                {{-- Carousel Controls --}}
+                <div class="flex items-center gap-2">
+                    <button type="button"
+                            @click="prev()"
+                            class="w-9 h-9 rounded-full border border-gray-200 bg-white hover:bg-gray-100 flex items-center justify-center text-gray-700 hover:text-gray-950 transition-colors shadow-sm focus:outline-none"
+                            aria-label="Previous image">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button type="button"
+                            @click="next()"
+                            class="w-9 h-9 rounded-full border border-gray-200 bg-white hover:bg-gray-100 flex items-center justify-center text-gray-700 hover:text-gray-950 transition-colors shadow-sm focus:outline-none"
+                            aria-label="Next image">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Main Featured Slide --}}
+            <div class="relative aspect-[16/9] md:aspect-[21/9] rounded-[24px] overflow-hidden bg-gray-100 border border-gray-200 shadow-sm group">
+                <template x-for="(imgUrl, index) in images" :key="index">
+                    <div x-show="active === index"
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 scale-98"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-200 absolute inset-0"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-98"
+                         class="w-full h-full">
+                        {{-- Only load image when slide is active or adjacent --}}
+                        <template x-if="Math.abs(active - index) <= 1 || (active === 0 && index === total - 1) || (active === total - 1 && index === 0)">
+                            <img :src="imgUrl"
+                                 alt="{{ $data['name'] }}"
+                                 loading="lazy"
+                                 decoding="async"
+                                 referrerpolicy="no-referrer"
+                                 class="w-full h-full object-cover">
+                        </template>
+                    </div>
+                </template>
+
+                {{-- Expand / Fullscreen Button --}}
+                <button type="button"
+                        @click="lightboxOpen = true"
+                        class="absolute bottom-4 right-4 bg-gray-950/80 hover:bg-gray-950 text-white text-xs font-bold px-3.5 py-2 rounded-full backdrop-blur-md flex items-center gap-1.5 transition-all shadow-md">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                    <span>View Fullscreen</span>
+                </button>
+            </div>
+
+            {{-- Thumbnail Strip with On-Demand Lazy Loading --}}
+            <div class="flex items-center gap-2.5 mt-3 overflow-x-auto pb-2 scrollbar-none"
+                 @scroll.passive="
+                     const el = $el;
+                     const scrollRight = el.scrollLeft + el.clientWidth;
+                     const totalWidth = el.scrollWidth;
+                     const approxVisibleCount = Math.min(total, Math.ceil((scrollRight / totalWidth) * total) + 2);
+                     for (let i = 0; i < approxVisibleCount; i++) {
+                         ensureThumbLoaded(i);
+                     }
+                 ">
+                <template x-for="(imgUrl, index) in images" :key="'thumb-' + index">
+                    <button type="button"
+                            @click="active = index; ensureThumbLoaded(index)"
+                            :class="active === index ? 'ring-2 ring-gray-950 border-transparent opacity-100' : 'border-gray-200 opacity-60 hover:opacity-100'"
+                            class="relative flex-shrink-0 w-20 h-14 md:w-24 md:h-16 rounded-xl overflow-hidden border bg-gray-100 transition-all focus:outline-none">
+                        <template x-if="loadedThumbs.includes(index)">
+                            <img :src="imgUrl"
+                                 loading="lazy"
+                                 decoding="async"
+                                 referrerpolicy="no-referrer"
+                                 class="w-full h-full object-cover">
+                        </template>
+                        <template x-if="!loadedThumbs.includes(index)">
+                            <div class="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
+                                <span class="text-[9px] font-mono text-gray-400" x-text="index + 1"></span>
+                            </div>
+                        </template>
+                    </button>
+                </template>
+            </div>
+
+            {{-- Lightbox Modal --}}
+            <div x-show="lightboxOpen"
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col justify-between p-4 md:p-8"
+                 @click.self="lightboxOpen = false">
+
+                {{-- Modal Header --}}
+                <div class="flex items-center justify-between text-white">
+                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400 tabular-nums"
+                          x-text="(active + 1) + ' / ' + total"></span>
+                    <button type="button"
+                            @click="lightboxOpen = false"
+                            class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                {{-- Modal Image Display --}}
+                <div class="relative flex-1 flex items-center justify-center my-4 overflow-hidden">
+                    <img :src="images[active]"
+                         alt="{{ $data['name'] }}"
+                         referrerpolicy="no-referrer"
+                         class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl">
+
+                    {{-- Next/Prev Overlay inside Modal --}}
+                    <button type="button"
+                            @click="prev()"
+                            class="absolute left-2 md:left-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md transition-colors">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button type="button"
+                            @click="next()"
+                            class="absolute right-2 md:right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md transition-colors">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+
+                {{-- Modal Footer Caption --}}
+                <div class="text-center text-xs text-gray-400 font-medium">
+                    Use arrow keys ← → or click buttons to navigate · Esc to close
+                </div>
             </div>
         </section>
     @endif

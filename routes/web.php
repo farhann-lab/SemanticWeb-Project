@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HeritageController;
+use App\Http\Controllers\ImageOptimizerController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StatisticsController;
 use App\Services\HeritageService;
@@ -63,6 +64,9 @@ Route::get('/heritage/{id}/images', fn (string $id, HeritageService $service) =>
 
 // 7. Statistics
 Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics');
+
+// Image optimization proxy & WebP converter
+Route::get('/optimized-image', [ImageOptimizerController::class, 'optimize'])->name('image.optimize');
 
 // 8. Connectivity check (local only): /test-fuseki
 if (app()->environment('local')) {
